@@ -57,17 +57,28 @@ def main():
 	full_res_dir = out_dir / "full_res"
 	low_res_dir = out_dir / "low_res"
 	
-	os.mkdir(full_res_dir)
-
+	os.makedirs(full_res_dir, exist_ok=True)
 	#
 	# Create low-res data
 	#
-	
+	#cont = 0
 	for file_name in os.listdir(in_dir):
 		file_path = os.path.join(in_dir, file_name)
 		print(file_path)
+		
 		if os.path.isfile(file_path):
+			destination_path = os.path.join(full_res_dir, file_name)
+			
+			# Check if the file already exists in the destination directory
+			if os.path.exists(destination_path):
+				print(f"File {file_name} already exists in {full_res_dir}. Skipping...")
+				continue
+			
+			# Copy the file if it doesn't already exist
 			shutil.copy(file_path, full_res_dir)
+		# cont += 1
+		# if cont >= 4:
+			# break
 	
 	csgo_dataset = CSGOHdf5Dataset(full_res_dir)
 
