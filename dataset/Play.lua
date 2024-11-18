@@ -24,7 +24,8 @@ if PLAY_FOR_FRAMES ~= nil then print("Playing for " .. PLAY_FOR_FRAMES .. " fram
 
 local util = require("util")
 
-local SCREENSHOT_FOLDER = "C:\\Users\\ifrat\\Documents\\AI-SM64\\MarioKart\\NeuralKart-master\\screenshots"
+local SCREENSHOT_FOLDER = "your/screenshot/folder/absolute/path/"
+local STATE_PATH = "your/state/absolute/path.state"
 local t = 0
 
 local tcp = require("lualibs.socket").tcp()
@@ -136,7 +137,7 @@ while util.readProgress() < 3 do
   -- If we haven't made any progress since the last check, just break.
   if frame % CHECK_PROGRESS_EVERY == 0 then
     if util.readProgress() <= max_progress then
-      savestate.load("C:\\Users\\ifrat\\Documents\\AI-SM64\\MarioKart\\BizHawk\\N64\\State\\LR.State")
+      savestate.load(STATE_PATH )
 	  frame = 1
 	  max_progress = util.readProgress()
     else max_progress = util.readProgress() end
@@ -146,7 +147,7 @@ while util.readProgress() < 3 do
   esc_prev = input.get()['Escape']
   
   if util.readProgress() >= 3 then
-	  savestate.load("C:\\Users\\ifrat\\Documents\\AI-SM64\\MarioKart\\BizHawk\\N64\\State\\LR.State")
+	  savestate.load(STATE_PATH)
 	  frame = 1
 	  max_progress = util.readProgress()
   end
