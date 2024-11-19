@@ -1,6 +1,3 @@
-Here's a structured, well-organized, and polished version of your README file. I've clarified the explanations, added commands where necessary, and ensured everything is consistent and easy to follow.
-
----
 
 # AI-MarioKart64
 
