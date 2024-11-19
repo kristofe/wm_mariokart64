@@ -142,5 +142,3 @@ This feature is still under development. For now, refer to [this blog post](http
 - [MK64 Steering Dataset](https://huggingface.co/datasets/DereWah/mk64-steering)
 
 ---
-
-Let me know if further edits are required!
