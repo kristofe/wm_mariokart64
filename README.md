@@ -36,25 +36,7 @@ Here's a structured, well-organized, and polished version of your README file. I
      ```  
      To install a different CUDA version, refer to the [PyTorch Installation Guide](https://pytorch.org/).
 
-3. **Set Up the Trained Model**  
-   - Create a folder named `trained`:  
-     ```bash
-     mkdir trained
-     ```
-   - Download the pre-trained model (~1.42 GB) from [HuggingFace](https://huggingface.co/DereWah/diamond-mariokart64).
-   - Place the root folder `csgo` inside the `trained` folder. The structure should look like this:
-     ```
-     trained/
-       └── csgo/
-           ├── config
-           ├── model
-           └── spawn
-     ```
-
-4. **Update the Code Configuration**  
-   Open the `src/play.py` file and update the variable representing the model folder to point to the folder you created earlier. If you called it `./trained` you're good to go already.
-
-5. **Run the Model**  
+3. **Run the Model**  
    ```bash
    python src/play.py
    ```  
@@ -65,6 +47,7 @@ Here's a structured, well-organized, and polished version of your README file. I
      - Numbers in between (e.g., `2`, `3`) steer progressively.
    - **Reset Simulation:** Press `Enter` to reset and jump to the next spawn.
 
+When running the python script above, the model will be downloaded automatically from [HuggingFace](https://huggingface.co/DereWah/diamond-mariokart64) (~1.42 GB).
 ---
 
 ## Training the Model
