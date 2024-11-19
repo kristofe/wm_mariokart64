@@ -132,7 +132,7 @@ Here's a structured, well-organized, and polished version of your README file. I
 
 ## Training on a Different Game
 
-This feature is still under development. For now, refer to [this blog post](https://derewah.dev/projects/ai-mariokart) for more information on how to train models on different games.
+Refer to [this blog post](https://derewah.dev/projects/ai-mariokart) for more information on how to train models on different games.
 
 ---
 
