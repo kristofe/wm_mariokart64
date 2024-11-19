@@ -37,7 +37,7 @@ def check_args(args: argparse.Namespace) -> None:
 def prepare_play_mode(cfg: DictConfig, args: argparse.Namespace) -> PlayEnv:
 
 	path_hf =  Path(snapshot_download(repo_id="DereWah/diamond-mariokart64", allow_patterns="csgo/*"))
-
+	# If you're running with a model that you already downloaded. simply change this path above to match the folder in which you put the model
 	path_ckpt = path_hf / "csgo/model/csgo.pt"
 	spawn_dir = path_hf / "csgo/spawn"
 
