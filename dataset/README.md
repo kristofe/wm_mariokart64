@@ -25,59 +25,55 @@ Each `.hdf5` file contains **1000 frames**, indexed from `0` to `999`. Each fram
         - Gradual steering (e.g., intermediate values between full left and full right).  
         - Manual data only captures **complete steering** left or right.
 
-    - **Last 4 values**:  
-        - Experimental parameters encoding the **current track** using a binary representation.  
-        - 4-bit binary value (e.g., `0000`, `0001`), mapping to 16 tracks.  
+    - **Last 16 values**:  
+        - Experimental parameters encoding the **current track** using a OneHot representation
+        - 16-bit onehot value (e.g., `1000000000000000`, `0100000000000000`), mapping to 16 tracks.
+        - Onehot is preferred over a 4-bits representation because it allows multiple maps to be "enabled" in the future, to mix them together.
         - The goal: dynamically modify the environment by switching track parameters.  
 
 ---
 
 ### **Track Mapping Table**
-Below is a template for mapping the binary track parameters to the corresponding tracks.  
+
+
+### **Mushroom Cup**
+| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
+|---------------------------|-------------|-----------------------|
+| 1000000000000000           | 0           | Luigi Raceway         |
+| 0100000000000000           | 1           | Moo Moo Farm          |
+| 0010000000000000           | 2           | Koopa Troopa Beach    |
+| 0001000000000000           | 3           | Kalimari Desert       |
 
 ---
 
-#### **Mushroom Cup**
-| **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
-|--------------------------|-------------|-----------------------|
-| 0000                     | 0           | Luigi Raceway         |
-| 0001                     | 1           | Moo Moo Farm          |
-| 0010                     | 2           | Koopa Troopa Beach    |
-| 0011                     | 3           | Kalimari Desert       |
+### **Fire Flower Cup**
+| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
+|---------------------------|-------------|-----------------------|
+| 0000100000000000           | 4           | Toad's Turnpike       |
+| 0000010000000000           | 5           | Frappe Snowland       |
+| 0000001000000000           | 6           | Choco Mountain        |
+| 0000000100000000           | 7           | Mario Raceway         |
 
 ---
 
-#### **Fire Flower Cup**
-| **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
-|--------------------------|-------------|-----------------------|
-| 0100                     | 4           | Toad's Turnpike       |
-| 0101                     | 5           | Frappe Snowland       |
-| 0110                     | 6           | Choco Mountain        |
-| 0111                     | 7           | Mario Raceway         |
+### **Star Cup**
+| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
+|---------------------------|-------------|-----------------------|
+| 0000000010000000           | 8           | Wario Stadium         |
+| 0000000001000000           | 9           | Sherbet Land          |
+| 0000000000100000           | 10          | Royal Raceway         |
+| 0000000000010000           | 11          | Bowser's Castle       |
 
 ---
 
-#### **Star Cup**
-| **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
-|--------------------------|-------------|-----------------------|
-| 1000                     | 8           | Wario Stadium         |
-| 1001                     | 9           | Sherbet Land          |
-| 1010                     | 10          | Royal Raceway         |
-| 1011                     | 11          | Bowser's Castle       |
+### **Special Cup**
+| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
+|---------------------------|-------------|-----------------------|
+| 0000000000001000           | 12          | D.K.'s Jungle Parkway |
+| 0000000000000100           | 13          | Yoshi Valley          |
+| 0000000000000010           | 14          | Banshee Boardwalk     |
+| 0000000000000001           | 15          | Rainbow Road          |
 
----
-
-#### **Special Cup**
-| **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
-|--------------------------|-------------|-----------------------|
-| 1100                     | 12          | D.K.'s Jungle Parkway |
-| 1101                     | 13          | Yoshi Valley          |
-| 1110                     | 14          | Banshee Boardwalk     |
-| 1111                     | 15          | Rainbow Road          |
-
---- 
-
-This format organizes the tracks neatly by trophies.
 ---
 
 <details>
