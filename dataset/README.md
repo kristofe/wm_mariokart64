@@ -35,8 +35,6 @@ Each `.hdf5` file contains **1000 frames**, indexed from `0` to `999`. Each fram
 ### **Track Mapping Table**
 Below is a template for mapping the binary track parameters to the corresponding tracks.  
 
-Here’s the updated table with dividers for each trophy:
-
 ---
 
 #### **Mushroom Cup**
