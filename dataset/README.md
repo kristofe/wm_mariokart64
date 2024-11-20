@@ -99,8 +99,12 @@ Each `.hdf5` file contains **1000 frames**, indexed from `0` to `999`. Each fram
 
 ---
 
-### **Step 2: Update Paths**
-1. Open `Play.lua`:  
+### **Step 2: Setup BizHawk QuickStates**
+The `Play.Lua` script automatically resets the game to the quickstate in slot 1 when the track has completed 3 laps.
+
+Make sure to save a State in that slot at the beginning of the race, to allow the script to reset.
+
+1. Open :  
    - Update the **file path** to your `.state` file.  
    - This `.state` file represents the game state after completing 3 laps (prevents the race from ending).  
 
