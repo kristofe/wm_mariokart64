@@ -34,8 +34,8 @@
      To install a different CUDA version, refer to the [PyTorch Installation Guide](https://pytorch.org/).
 
 3. **Run the Model**  
-   When running the python script above, the model will be downloaded automatically from [HuggingFace](https://huggingface.co/DereWah/diamond-mariokart64) (~1.42 GB).
-   
+   When running the python script, the model will be downloaded automatically from [HuggingFace](https://huggingface.co/DereWah/diamond-mariokart64) (~1.42 GB).
+
    ```bash
    python src/play.py
    ```  

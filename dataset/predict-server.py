@@ -61,7 +61,7 @@ def capture_frame(prediction, img):
 		t = 0
 		print("Saving hdf5 file and skipping to next...")
 	# Convert from BGRA to BGR (OpenCV format)
-	img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+	img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
 	vector = decimal_to_vector(prediction)
 	#cv2.imwrite(f"{output_dir}/frame_{t}_{str(list(vector))}.png", img)

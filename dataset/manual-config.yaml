@@ -1,0 +1,9 @@
+window_name: "Mario Kart 64 (USA) [Nintendo 64] - BizHawk"
+target_width: 320
+target_height: 240
+keybinds:
+    forward: "a"
+    left: "left"
+    brake: "s"
+    right: "right"
+    use: "d"
