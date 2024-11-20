@@ -22,6 +22,9 @@ root_folder = "D:\\MK64AI_dataset\\"
 target_width = 320
 target_height = 240
 
+static_input_vector = [1, 0, 0] #NeuralKart always accelerates and never brakes or uses action items.
+map_selector = [0, 0, 0, 0] #Binary representation of track index. Check https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
+
 def prepare_image(im):
 	im = im.resize((INPUT_WIDTH, INPUT_HEIGHT))
 	im_arr = np.frombuffer(im.tobytes(), dtype=np.uint8)
@@ -64,9 +67,12 @@ def capture_frame(prediction, img):
 	img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
 	vector = decimal_to_vector(prediction)
+	
+	onehot = static_input_vector + vector + map_selector
+	
 	#cv2.imwrite(f"{output_dir}/frame_{t}_{str(list(vector))}.png", img)
 	h5file.create_dataset("frame_"+str(t)+"_x", data=img)
-	h5file.create_dataset("frame_"+str(t)+"_y", data=list(vector))
+	h5file.create_dataset("frame_"+str(t)+"_y", data=list(onehot))
 	t += 1
 	return True
 

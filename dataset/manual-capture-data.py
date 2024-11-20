@@ -32,7 +32,7 @@ output_dir = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
 capture_interval = 0.05  # Capture every 0.05 seconds
 
 
-map_selector = [1, 0] #Length should be the amount of different maps; 1st value is LR, 2nd value is ???
+map_selector = [0, 0, 0, 0] #Binary representation of track index. Check https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
 
 def list_open_windows():
 	# Get all open windows
@@ -168,7 +168,7 @@ def capture_frame(window_handle, h5file):
 
 	onehot = encode_inputs(keys_pressed)
 	print(onehot)
-	h5file.create_dataset("frame_"+str(t)+"_y", data=list(encode_inputs(keys_pressed)))
+	h5file.create_dataset("frame_"+str(t)+"_y", data=list(onehot))
 
 	t += 1
 	return True
