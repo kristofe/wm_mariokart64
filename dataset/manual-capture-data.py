@@ -28,7 +28,7 @@ target_height = config.get("target_height", 240)
 # Initialize some variables
 frames_data = []
 keys_pressed = []
-output_dir = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+output_dir = "recordings/" + datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
 capture_interval = 0.05  # Capture every 0.05 seconds
 
 
@@ -74,7 +74,7 @@ valid_keys = [
 ]
 
 t = 0
-file_prefix = output_dir
+file_prefix = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
 file_index = 0
 
 keys_pressed = []  # List of currently pressed keys
