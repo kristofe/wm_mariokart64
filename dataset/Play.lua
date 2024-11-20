@@ -146,7 +146,7 @@ while util.readProgress() < 3 do
   esc_prev = input.get()['Escape']
   
   if util.readProgress() >= 3 then
-	  savestate.load(STATE_PATH)
+	  savestate.loadslot(1)
 	  frame = 1
 	  max_progress = util.readProgress()
   end
