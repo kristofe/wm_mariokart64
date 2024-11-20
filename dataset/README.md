@@ -39,7 +39,7 @@ Here’s the updated table with dividers for each trophy:
 
 ---
 
-#### **Mushroom Cup 150cc**
+#### **Mushroom Cup**
 | **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
 |--------------------------|-------------|-----------------------|
 | 0000                     | 0           | Luigi Raceway         |
@@ -49,7 +49,7 @@ Here’s the updated table with dividers for each trophy:
 
 ---
 
-#### **Fire Flower Cup 150cc**
+#### **Fire Flower Cup**
 | **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
 |--------------------------|-------------|-----------------------|
 | 0100                     | 4           | Toad's Turnpike       |
