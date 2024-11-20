@@ -25,6 +25,7 @@ target_height = 240
 static_input_vector = [1, 0, 0] #NeuralKart always accelerates and never brakes or uses action items.
 map_id = 0 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
 map_selector = [0] * 16 #OneHot Representation of the map index.
+map_selector[map_id] = 1
 
 def prepare_image(im):
 	im = im.resize((INPUT_WIDTH, INPUT_HEIGHT))
