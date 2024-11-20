@@ -162,7 +162,7 @@ def capture_frame(window_handle, h5file):
 	# Convert from BGRA to BGR (OpenCV format)
 	img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
-	cv2.imwrite(f"{output_dir}/frame_{t}.png", img)
+	#cv2.imwrite(f"{output_dir}/frame_{t}.png", img)
 	
 	h5file.create_dataset("frame_"+str(t)+"_x", data=img)
 
