@@ -35,15 +35,51 @@ Each `.hdf5` file contains **1000 frames**, indexed from `0` to `999`. Each fram
 ### **Track Mapping Table**
 Below is a template for mapping the binary track parameters to the corresponding tracks.  
 
+Here’s the updated table with dividers for each trophy:
+
+---
+
+#### **Mushroom Cup 150cc**
 | **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
 |--------------------------|-------------|-----------------------|
-| 0000                     | 0           | *To be mapped*        |
-| 0001                     | 1           | *To be mapped*        |
-| 0010                     | 2           | *To be mapped*        |
-| 0011                     | 3           | *To be mapped*        |
-| ...                      | ...         | ...                   |
-| 1111                     | 15          | *To be mapped*        |
+| 0000                     | 0           | Luigi Raceway         |
+| 0001                     | 1           | Moo Moo Farm          |
+| 0010                     | 2           | Koopa Troopa Beach    |
+| 0011                     | 3           | Kalimari Desert       |
 
+---
+
+#### **Fire Flower Cup 150cc**
+| **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
+|--------------------------|-------------|-----------------------|
+| 0100                     | 4           | Toad's Turnpike       |
+| 0101                     | 5           | Frappe Snowland       |
+| 0110                     | 6           | Choco Mountain        |
+| 0111                     | 7           | Mario Raceway         |
+
+---
+
+#### **Star Cup**
+| **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
+|--------------------------|-------------|-----------------------|
+| 1000                     | 8           | Wario Stadium         |
+| 1001                     | 9           | Sherbet Land          |
+| 1010                     | 10          | Royal Raceway         |
+| 1011                     | 11          | Bowser's Castle       |
+
+---
+
+#### **Special Cup**
+| **Track Binary (4-bit)** | **Decimal** | **Track Name**        |
+|--------------------------|-------------|-----------------------|
+| 1100                     | 12          | D.K.'s Jungle Parkway |
+| 1101                     | 13          | Yoshi Valley          |
+| 1110                     | 14          | Banshee Boardwalk     |
+| 1111                     | 15          | Rainbow Road          |
+
+--- 
+
+This format organizes the tracks neatly by trophies.
 ---
 
 <details>
