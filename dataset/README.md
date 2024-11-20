@@ -55,8 +55,9 @@ Below is a template for mapping the binary track parameters to the corresponding
         - `[1, 0, 0, ..., 0]` → Steer Left (`-1.0`).  
         - `[0, ..., 0, 1]` → Steer Right (`1.0`).  
         - Intermediate positions represent **progressive steering** (e.g., no steer = `0` in the middle).  
-        
+
 </details>
+
 ---
 
 ## **Setup**
