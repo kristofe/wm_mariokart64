@@ -32,7 +32,9 @@ output_dir = "recordings/" + datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S
 capture_interval = 0.05  # Capture every 0.05 seconds
 
 
-map_selector = [0, 0, 0, 0] #Binary representation of track index. Check https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
+map_id = 0 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
+map_selector = [0] * 16 #OneHot Representation of the map index.
+map_selector[map_id] = 1
 
 def list_open_windows():
 	# Get all open windows
