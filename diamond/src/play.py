@@ -9,7 +9,7 @@ import torch
 
 from agent import Agent
 from envs import WorldModelEnv
-from game import Game, PlayEnv
+from game import Game, PlayEnv, ColabGame
 
 
 OmegaConf.register_new_resolver("eval", eval)
@@ -23,6 +23,7 @@ def parse_args() -> argparse.Namespace:
 	parser.add_argument("--mouse-multiplier", type=int, default=10, help="Multiplication factor for the mouse movement.")
 	parser.add_argument("--size-multiplier", type=int, default=2, help="Multiplication factor for the screen size.")
 	parser.add_argument("--compile", action="store_true", help="Turn on model compilation.")
+	parser.add_argument("--colab", action="store_true", help="Run the model on COLAB, without using PyGame.")
 	parser.add_argument("--fps", type=int, default=15, help="Frame rate.")
 	parser.add_argument("--no-header", action="store_true")
 	return parser.parse_args()
@@ -96,8 +97,11 @@ def main():
 	w, h = (cfg.env.train.size,) * 2 if isinstance(cfg.env.train.size, int) else cfg.env.train.size
 	size_h, size_w = h * args.size_multiplier, w * args.size_multiplier
 	env = prepare_play_mode(cfg, args)
-	game = Game(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header)
-	game.run()
+	if args.colab:
+		colab_game = ColabGame(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header)
+	else:
+		game = Game(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header)
+		game.run()
 
 
 if __name__ == "__main__":
