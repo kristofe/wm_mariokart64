@@ -94,7 +94,7 @@ This format organizes the tracks neatly by trophies.
 
 ---
 
-## **Setup**
+## **Setup - Automatic Playing**
 
 ### **Step 1: Environment Setup**
 1. Clone the [NeuralKart repository](https://github.com/rameshvarun/NeuralKart).  
@@ -122,6 +122,20 @@ This format organizes the tracks neatly by trophies.
 3. Run the script to start the prediction server.  
 
 ---
+
+## **Setup - Manual Playing**
+
+In order to capture a good dataset, some track laps should be manually recorded. In these tracks you should focus on collecting input on "corner cases": basically stuff that rarely happens in gameplay but behaviour that you still want to implement. An example is going against walls: if there is no data about how bumping works the model will blur this type of actions. Same goes for going against a tree, falling off a map, going backwards, steering and accelerating at the same time, steering while being at a full stop, using action items when you have none, etc.
+
+Configure `manual-config.yaml` to your needs. You can leave input values as default. For the game window name, if you're not sure leave it as is.
+
+Open BizHawk emulator and load into a track. As soon as the track starts create a SaveState in position 1. This will be used by you to reset the map when you are coming to the end of the 3rd lap. Simply press F1 to reset the run.
+
+Run `manual-capture-data.py`. If you put in the wrong window name it will throw an error not finding the emulator window. It will also display the currently open windows: go back in the config and paste in it the window name corresponding to BizHawk.
+
+If you get an error about capturing screenshots, first try and capturing a screenshot on your own in bizhawk (press ctrl+C), then restart the script.
+
+To stop the script press ESC.
 
 ### **Additional Notes**
 - Always ensure the `.state` file is correctly configured in `Play.lua`.  
