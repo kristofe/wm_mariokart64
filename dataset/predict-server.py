@@ -25,8 +25,6 @@ target_height = 240
 
 static_input_vector = [1, 0, 0] #NeuralKart always accelerates and never brakes or uses action items.
 map_id = 1 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
-map_selector = [0] * 16 #OneHot Representation of the map index.
-map_selector[map_id] = 1
 
 noise_mode = False
 
@@ -74,6 +72,8 @@ def capture_frame(prediction, img, do_boost):
 	img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
 	vector = decimal_to_vector(prediction)
+	map_selector = [0] * 16 #OneHot Representation of the map index.
+	map_selector[map_id] = 1
 	
 	inputs_vector = static_input_vector
 	if do_boost:
