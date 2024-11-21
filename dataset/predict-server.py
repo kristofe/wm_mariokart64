@@ -17,13 +17,14 @@ h5file = None
 output_dir = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
 file_prefix = output_dir
 from train import create_model, is_valid_track_code, INPUT_WIDTH, INPUT_HEIGHT, INPUT_CHANNELS
-root_folder = "D:\\MK64AI_dataset\\"
-
+root_folder = "./recordings/"
+created_folder = False
+BOOST_CHANCE = 100
 target_width = 320
 target_height = 240
 
 static_input_vector = [1, 0, 0] #NeuralKart always accelerates and never brakes or uses action items.
-map_id = 0 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
+map_id = 1 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
 map_selector = [0] * 16 #OneHot Representation of the map index.
 map_selector[map_id] = 1
 
@@ -55,7 +56,7 @@ def decimal_to_vector(decimal_number):
     
     return vector
 	
-def capture_frame(prediction, img):
+def capture_frame(prediction, img, do_boost):
 	global t
 	global file_index
 	global h5file
@@ -66,7 +67,6 @@ def capture_frame(prediction, img):
 		h5file_name = file_prefix+"_"+str(file_index)+".hdf5"
 		if noise_mode:
 			h5file_name = "noised_" + h5file_name
-		
 		h5file = h5py.File(root_folder + output_dir+"/"+h5file_name, 'w')	
 		t = 0
 		print("Saving hdf5 file and skipping to next...")
@@ -75,8 +75,14 @@ def capture_frame(prediction, img):
 	img = cv2.resize(img, (target_width, target_height))
 	vector = decimal_to_vector(prediction)
 	
-	onehot = static_input_vector + vector + map_selector
-	
+	inputs_vector = static_input_vector
+	if do_boost:
+		inputs_vector[2] = 1
+	else:
+		inputs_vector[2] = 0
+
+	onehot = inputs_vector + vector + map_selector
+	print(onehot)
 	#cv2.imwrite(f"{output_dir}/frame_{t}_{str(list(vector))}.png", img)
 	h5file.create_dataset("frame_"+str(t)+"_x", data=img)
 	h5file.create_dataset("frame_"+str(t)+"_y", data=list(onehot))
@@ -86,13 +92,14 @@ def capture_frame(prediction, img):
 class TCPHandler(StreamRequestHandler):
 	def handle(self):
 		global t
+		global course
 		prediction = None
 		if args.all:
 			weights_file = 'weights/all.hdf5'
 			logger.info("Loading {}...".format(weights_file))
 			model.load_weights(weights_file)
-		os.makedirs(root_folder + output_dir, exist_ok=True)
 		logger.info("Handling a new connection...")
+		os.makedirs(root_folder + output_dir, exist_ok=True)
 		for line in self.rfile:
 			message = str(line.strip(),'utf-8')
 			#logger.debug(message)
@@ -113,7 +120,7 @@ class TCPHandler(StreamRequestHandler):
 							prediction = np.clip(prediction, -1, 1)
 					prediction = round(prediction[0], 1)
 					im_array = np.array(im)
-					do_boost = 1 if random.randint(1, 500) == 1 else 0
+					do_boost = 1 if random.randint(1, BOOST_CHANCE) == 1 else 0
 					self.wfile.write((str(prediction) + "|" + str(do_boost) + "\n").encode('utf-8'))
 					capture_frame(prediction, im_array, do_boost)
 				else:
@@ -128,11 +135,15 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Start a prediction server that other apps will call into.')
 	parser.add_argument('-a', '--all', action='store_true', help='Use the combined weights for all tracks, rather than selecting the weights file based off of the course code sent by the Play.lua script.', default=False)
 	parser.add_argument('-p', '--port', type=int, help='Port number', default=36296)
+	parser.add_argument('--map_id', type=int, help='Map index', default=0)
+	parser.add_argument('--boost', type=int, help='Boosting chance', default=100)
 	parser.add_argument('-c', '--cpu', action='store_true', help='Force Tensorflow to use the CPU.', default=False)
 	parser.add_argument("--add_noise", action="store_true", help="Add random movement noise to the agent outputs.")
 	args = parser.parse_args()
 
 	noise_mode = args.add_noise
+	map_id = args.map_id
+	BOOST_CHANCE = args.boost
 	if args.cpu:
 		os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 		os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
