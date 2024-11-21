@@ -27,6 +27,8 @@ map_id = 0 #For more information refer to https://github.com/Dere-Wah/AI-MarioKa
 map_selector = [0] * 16 #OneHot Representation of the map index.
 map_selector[map_id] = 1
 
+noise_mode = False
+
 def prepare_image(im):
 	im = im.resize((INPUT_WIDTH, INPUT_HEIGHT))
 	im_arr = np.frombuffer(im.tobytes(), dtype=np.uint8)
@@ -62,6 +64,9 @@ def capture_frame(prediction, img):
 		if h5file != None:
 			h5file.close()
 		h5file_name = file_prefix+"_"+str(file_index)+".hdf5"
+		if noise_mode:
+			h5file_name = "noised_" + h5file_name
+		
 		h5file = h5py.File(root_folder + output_dir+"/"+h5file_name, 'w')	
 		t = 0
 		print("Saving hdf5 file and skipping to next...")
@@ -102,9 +107,10 @@ class TCPHandler(StreamRequestHandler):
 				im = ImageGrab.grabclipboard()
 				if im != None:
 					prediction = model.predict(prepare_image(im), batch_size=1)[0]
-					# if random.random() < 1/5:
-						# prediction += random.uniform(-10, 10)
-						# prediction = np.clip(prediction, -1, 1)
+					if noise_mode:
+						if random.random() < 1/5:
+							prediction += random.uniform(-10, 10)
+							prediction = np.clip(prediction, -1, 1)
 					prediction = round(prediction[0], 1)
 					self.wfile.write((str(prediction) + "\n").encode('utf-8'))
 					im_array = np.array(im)
@@ -122,8 +128,10 @@ if __name__ == "__main__":
 	parser.add_argument('-a', '--all', action='store_true', help='Use the combined weights for all tracks, rather than selecting the weights file based off of the course code sent by the Play.lua script.', default=False)
 	parser.add_argument('-p', '--port', type=int, help='Port number', default=36296)
 	parser.add_argument('-c', '--cpu', action='store_true', help='Force Tensorflow to use the CPU.', default=False)
+	parser.add_argument("--add_noise", action="store_true", help="Add random movement noise to the agent outputs.")
 	args = parser.parse_args()
 
+	noise_mode = args.add_noise
 	if args.cpu:
 		os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 		os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
