@@ -107,10 +107,18 @@ while util.readProgress() < 3 do
     end
   else
     if message ~= "PREDICTIONERROR" then
-      current_action = tonumber(message)
+      local action_part, boost_part = message:match("^(.-)|(.+)$")
+
+      local current_action = tonumber(action_part)
+      local do_boost = tonumber(boost_part)
       for i=1, WAIT_FRAMES do
         joypad.set({["P1 A"] = true})
         joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
+        if do_boost == 1 then
+          joypad.set({["P1 Z"] = true})
+        else
+          joypad.set({["P1 Z"] = false})
+        end
         draw_info()
         emu.frameadvance()
       end

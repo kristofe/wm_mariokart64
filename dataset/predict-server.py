@@ -112,9 +112,10 @@ class TCPHandler(StreamRequestHandler):
 							prediction += random.uniform(-10, 10)
 							prediction = np.clip(prediction, -1, 1)
 					prediction = round(prediction[0], 1)
-					self.wfile.write((str(prediction) + "\n").encode('utf-8'))
 					im_array = np.array(im)
-					capture_frame(prediction, im_array)
+					do_boost = 1 if random.randint(1, 500) == 1 else 0
+					self.wfile.write((str(prediction) + "|" + str(do_boost) + "\n").encode('utf-8'))
+					capture_frame(prediction, im_array, do_boost)
 				else:
 					self.wfile.write("PREDICTIONERROR\n".encode('utf-8'))
 
