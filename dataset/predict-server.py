@@ -135,7 +135,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Start a prediction server that other apps will call into.')
 	parser.add_argument('-a', '--all', action='store_true', help='Use the combined weights for all tracks, rather than selecting the weights file based off of the course code sent by the Play.lua script.', default=False)
 	parser.add_argument('-p', '--port', type=int, help='Port number', default=36296)
-	parser.add_argument('--map_id', type=int, help='Map index', default=0)
+	parser.add_argument('--map_id', type=int, help='Map index', required=True)
 	parser.add_argument('--boost', type=int, help='Boosting chance', default=100)
 	parser.add_argument('-c', '--cpu', action='store_true', help='Force Tensorflow to use the CPU.', default=False)
 	parser.add_argument("--add_noise", action="store_true", help="Add random movement noise to the agent outputs.")

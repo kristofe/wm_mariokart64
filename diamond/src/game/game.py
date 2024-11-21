@@ -170,7 +170,7 @@ class Game:
 				map_id += 1
 				if map_id >= 2:
 					map_id = 0
-
+			# This should be edited to be able to change and activate / deactivate multiple maps at once
 
 			csgo_action = CSGOAction(keys_pressed, steering_value, map_id)
 			next_obs, rew, end, trunc, info = self.env.step(csgo_action)

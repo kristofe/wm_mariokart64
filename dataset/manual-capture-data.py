@@ -218,7 +218,7 @@ def main():
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Start a program that logs your mario kart 64 gameplay.')
-	parser.add_argument('--map_id', type=int, help='Map index', default=0)
+	parser.add_argument('--map_id', type=int, help='Map index', required=True)
 	args = parser.parse_args()
 	map_id = args.map_id
 	main()
