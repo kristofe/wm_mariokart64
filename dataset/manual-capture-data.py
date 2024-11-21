@@ -34,8 +34,6 @@ capture_interval = 0.05  # Capture every 0.05 seconds
 
 
 map_id = 0 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
-map_selector = [0] * 16 #OneHot Representation of the map index.
-map_selector[map_id] = 1
 
 def list_open_windows():
 	# Get all open windows
@@ -141,6 +139,9 @@ def encode_inputs(keys_pressed):
 		direction_vector[0] = 1
 	if keyboard.Key.right in keys_pressed:
 		direction_vector[-1] = 1
+
+	map_selector = [0] * 16 #OneHot Representation of the map index.
+	map_selector[map_id] = 1
 
 	# Concatenate the two vectors
 	encoded_vector = movement_vector + direction_vector + map_selector
