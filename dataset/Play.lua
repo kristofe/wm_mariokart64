@@ -46,13 +46,13 @@ client.unpause()
 outgoing_message, outgoing_message_index = nil, nil
 function request_prediction()
   if USE_CLIPBOARD then
-    client.screenshottoclipboard()
-    outgoing_message = "PREDICTFROMCLIPBOARD\n"
+	client.screenshottoclipboard()
+	outgoing_message = "PREDICTFROMCLIPBOARD\n"
   else
 	local SCREENSHOT_FILE = SCREENSHOT_FOLDER .. "\\frame_" .. t .. ".png"
-    client.screenshot(SCREENSHOT_FILE)
+	client.screenshot(SCREENSHOT_FILE)
 	print(SCREENSHOT_FILE)
-    outgoing_message = "PREDICT:" .. SCREENSHOT_FILE .. "\n"
+	outgoing_message = "PREDICT:" .. SCREENSHOT_FILE .. "\n"
   end
   outgoing_message_index = 1
 end
@@ -67,6 +67,7 @@ end
 local exit_guid = event.onexit(onexit)
 
 local current_action = 0
+local current_boost = 0
 local frame = 1
 local max_progress = util.readProgress()
 local esc_prev = input.get()['Escape']
@@ -76,66 +77,65 @@ BOX_WIDTH, BOX_HEIGHT = 100, 4
 SLIDER_WIDTH, SLIDER_HIEGHT = 4, 16
 function draw_info()
   gui.drawBox(BOX_CENTER_X - BOX_WIDTH / 2, BOX_CENTER_Y - BOX_HEIGHT / 2,
-              BOX_CENTER_X + BOX_WIDTH / 2, BOX_CENTER_Y + BOX_HEIGHT / 2,
-              none, 0x60FFFFFF)
+			  BOX_CENTER_X + BOX_WIDTH / 2, BOX_CENTER_Y + BOX_HEIGHT / 2,
+			  none, 0x60FFFFFF)
   gui.drawBox(BOX_CENTER_X + current_action*(BOX_WIDTH / 2) - SLIDER_WIDTH / 2, BOX_CENTER_Y - SLIDER_HIEGHT / 2,
-              BOX_CENTER_X + current_action*(BOX_WIDTH / 2) + SLIDER_WIDTH / 2, BOX_CENTER_Y + SLIDER_HIEGHT / 2,
-              none, 0xFFFF0000)
+			  BOX_CENTER_X + current_action*(BOX_WIDTH / 2) + SLIDER_WIDTH / 2, BOX_CENTER_Y + SLIDER_HIEGHT / 2,
+			  none, 0xFFFF0000)
 end
 
 while util.readProgress() < 3 do
   -- Process the outgoing message.
   if outgoing_message ~= nil then
-    local sent, error, last_byte = tcp:send(outgoing_message, outgoing_message_index)
-    if sent ~= nil then
-      outgoing_message = nil
-      outgoing_message_index = nil
-    else
-      if error == "timeout" then
-        outgoing_message_index = last_byte + 1
-      else
-        print("Send failed: ", error); break
-      end
-    end
+	local sent, error, last_byte = tcp:send(outgoing_message, outgoing_message_index)
+	if sent ~= nil then
+	  outgoing_message = nil
+	  outgoing_message_index = nil
+	else
+	  if error == "timeout" then
+		outgoing_message_index = last_byte + 1
+	  else
+		print("Send failed: ", error); break
+	  end
+	end
   end
 
   local message, error
   message, error, receive_buffer = tcp:receive("*l", receive_buffer)
   if message == nil then
-    if error ~= "timeout" then
-      print("Receive failed: ", error); break
-    end
+	if error ~= "timeout" then
+	  print("Receive failed: ", error); break
+	end
   else
-    if message ~= "PREDICTIONERROR" then
-      local action_part, boost_part = message:match("^(.-)|(.+)$")
-
-      local current_action = tonumber(action_part)
-      local do_boost = tonumber(boost_part)
-      for i=1, WAIT_FRAMES do
-        joypad.set({["P1 A"] = true})
-        joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
-        if do_boost == 1 then
-          joypad.set({["P1 Z"] = true})
-        else
-          joypad.set({["P1 Z"] = false})
-        end
-        draw_info()
-        emu.frameadvance()
-      end
-    else
-      print("Prediction error...")
-    end
-    request_prediction()
+	if message ~= "PREDICTIONERROR" then
+	  local action_part, boost_part = message:match("^(.-)|(.+)$")
+	  current_action = tonumber(action_part)
+	  current_boost = tonumber(boost_part)
+	 
+	  for i=1, WAIT_FRAMES do
+		joypad.set({["P1 A"] = true})
+		joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
+		draw_info()
+		emu.frameadvance()
+	  end
+	else
+	  print("Prediction error...")
+	end
+	request_prediction()
   end
-
-  joypad.set({["P1 A"] = true})
+  if current_boost == 1 then
+	print("boosting now")
+    joypad.set({["P1 Z"] = true, ["P1 A"] = true})
+  else
+	joypad.set({["P1 Z"] = false, ["P1 A"] = true})
+  end
   joypad.setanalog({["P1 X Axis"] = util.convertSteerToJoystick(current_action) })
   draw_info()
   emu.frameadvance()
 
   if PLAY_FOR_FRAMES ~= nil then
-    if PLAY_FOR_FRAMES > 0 then PLAY_FOR_FRAMES = PLAY_FOR_FRAMES - 1
-    elseif PLAY_FOR_FRAMES == 0 then break end
+	if PLAY_FOR_FRAMES > 0 then PLAY_FOR_FRAMES = PLAY_FOR_FRAMES - 1
+	elseif PLAY_FOR_FRAMES == 0 then break end
   end
 
   frame = frame + 1
@@ -143,11 +143,11 @@ while util.readProgress() < 3 do
 
   -- If we haven't made any progress since the last check, just break.
   if frame % CHECK_PROGRESS_EVERY == 0 then
-    if util.readProgress() <= max_progress then
-      savestate.loadslot(1)
+	if util.readProgress() <= max_progress then
+	  savestate.loadslot(1)
 	  frame = 1
 	  max_progress = util.readProgress()
-    else max_progress = util.readProgress() end
+	else max_progress = util.readProgress() end
   end
 
   if not esc_prev and input.get()['Escape'] then break end
