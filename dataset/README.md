@@ -104,16 +104,7 @@ The `Play.Lua` script automatically resets the game to the quickstate in slot 1 
 
 Make sure to save a State in that slot at the beginning of the race, to allow the script to reset.
 
-1. Open :  
-   - Update the **file path** to your `.state` file.  
-   - This `.state` file represents the game state after completing 3 laps (prevents the race from ending).  
-
-   > **Tip:** Save the state in the emulator (BizHawk) by starting a lap and saving via the UI.  
-
-2. **Screenshot Mode (Optional):**  
-   - If saving screenshots to disk, update the **file path** for screenshot storage.  
-   - Using the **clipboard** is recommended to reduce disk writes.  
-
+This dataset collection format only currently supports "screenshot mode". (It is enabled by default, so you should not encounter any issue with this.)
 ---
 
 ### **Step 3: Replace and Configure `predict-server.py`**
