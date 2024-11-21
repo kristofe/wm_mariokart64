@@ -118,8 +118,11 @@ Make sure to save a State in that slot at the beginning of the race, to allow th
 
 ### **Step 3: Replace and Configure `predict-server.py`**
 1. Replace the `predict-server.py` script in NeuralKart with the provided version.  
-2. Edit the file paths in the script.  
+2. Edit the output file paths in the script.  
 3. Run the script to start the prediction server.  
+4. You can run the script with custom parameters: 
+   - `--boost=<x>` is the probability 1/x that boost is used
+   - `--map_id=<x>` specifies which track you are going to play. Refer to the table above to view the mapping.
 
 ---
 
