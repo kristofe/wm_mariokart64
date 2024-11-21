@@ -14,6 +14,7 @@ import datetime
 import yaml	
 import pygetwindow as gw
 from PIL import Image, ImageGrab
+import argparse
 
 
 # Load configuration from YAML file
@@ -216,4 +217,8 @@ def main():
 	print("Data saved.")
 
 if __name__ == "__main__":
+	parser = argparse.ArgumentParser(description='Start a program that logs your mario kart 64 gameplay.')
+	parser.add_argument('--map_id', type=int, help='Map index', default=0)
+	args = parser.parse_args()
+	map_id = args.map_id
 	main()

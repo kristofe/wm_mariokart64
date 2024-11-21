@@ -78,7 +78,7 @@ class Game:
 				# screen.blit(surface, (x_center - w // 2, y_center + self.height // 2))
 
 		def reset():
-			nonlocal obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click, steering_value
+			nonlocal obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click, steering_value, map_id
 			obs, info = self.env.reset()
 			pygame.event.clear()
 			do_reset = False
@@ -86,31 +86,8 @@ class Game:
 			ep_length = 0
 			keys_pressed = []
 			steering_value = 0.0
+			map_id = 0
 			l_click = r_click = False
-		
-		def get_steering_value(keys_pressed):
-			if pygame.K_1 in keys_pressed:
-				return -1.0
-			elif pygame.K_2 in keys_pressed:
-				return -0.8
-			elif pygame.K_3 in keys_pressed:
-				return -0.6
-			elif pygame.K_4 in keys_pressed:
-				return -0.4
-			elif pygame.K_5 in keys_pressed:
-				return -0.2
-			elif pygame.K_6 in keys_pressed:
-				return 0.0
-			elif pygame.K_7 in keys_pressed:
-				return 0.2
-			elif pygame.K_8 in keys_pressed:
-				return 0.4
-			elif pygame.K_9 in keys_pressed:
-				return 0.6
-			elif pygame.K_0 in keys_pressed:
-				return 0.8
-			else:
-				return None  # No relevant key pressed
 
 		obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click = (None,) * 8
 
@@ -184,10 +161,18 @@ class Game:
 			if do_wait and not do_one_step:
 				continue
 
-			k = get_steering_value(keys_pressed)
-			if k is not None:
-				steering_value = k
-			csgo_action = CSGOAction(steering_value)
+			if pygame.K_LEFT in keys_pressed:
+				steering_value = -1.0
+			elif pygame.K_RIGHT in keys_pressed:
+				steering_value = 1.0
+			
+			if pygame.K_R in keys_pressed:
+				map_id += 1
+				if map_id >= 2:
+					map_id = 0
+
+
+			csgo_action = CSGOAction(keys_pressed, steering_value, map_id)
 			next_obs, rew, end, trunc, info = self.env.step(csgo_action)
 
 			ep_return += rew.item()
