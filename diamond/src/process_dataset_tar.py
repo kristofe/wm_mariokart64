@@ -131,7 +131,7 @@ def main():
 
 	with Path("test_split.txt").open("w") as f:
 		for datasetfile in os.listdir(full_res_dir):
-			is_test = random.randint(1, 5) == 1
+			is_test = random.randint(1, 12) == 1
 			if is_test:
 				print(f"selected {datasetfile} as a test split.")
 				f.write(datasetfile + "\n")
