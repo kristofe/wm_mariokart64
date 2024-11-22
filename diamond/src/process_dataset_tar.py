@@ -42,6 +42,8 @@ def parse_args():
 		type=Path,
 		help="a new directory (should not exist already), the script will untar and process data there",
 	)
+
+	parser.add_argument("--fix", action="store_true", help="Use this to edit an existing dataset.")
 	return parser.parse_args()
 
 
@@ -98,7 +100,7 @@ def main():
 		)
 		return
 
-	if out_dir.exists():
+	if not args.fix and out_dir.exists():
 		print(f"Wrong usage: the output directory should not exist ({args.out_dir})")
 		return
 
@@ -107,27 +109,28 @@ def main():
 	full_res_dir = out_dir / "full_res"
 	low_res_dir = out_dir / "low_res"
 
-	tar_files = [
-		x for x in tar_dir.iterdir() if str(x).endswith(".tar.gz")
-	]
-	n = len(tar_files)
+	if not args.fix:
+		tar_files = [
+			x for x in tar_dir.iterdir() if str(x).endswith(".tar.gz")
+		]
+		n = len(tar_files)
 
 
-	str_files = "\n".join(map(str, tar_files))
-	print(f"Ready to untar {n} tar files:\n{str_files}")
+		str_files = "\n".join(map(str, tar_files))
+		print(f"Ready to untar {n} tar files:\n{str_files}")
 
-	remove_tar = (
-		input("Remove .tar files once they are processed? [y|N] ").lower() == "y"
-	)
+		remove_tar = (
+			input("Remove .tar files once they are processed? [y|N] ").lower() == "y"
+		)
 
-	# Untar CSGO files
-	f = partial(process_tar, out_dir=full_res_dir, remove_tar=remove_tar)
-	with Pool(n) as p:
-		p.map(f, tar_files)
+		# Untar CSGO files
+		f = partial(process_tar, out_dir=full_res_dir, remove_tar=remove_tar)
+		with Pool(n) as p:
+			p.map(f, tar_files)
 
-	print(f"{n} .tar files unpacked in {full_res_dir}")
+		print(f"{n} .tar files unpacked in {full_res_dir}")
 
-	move_and_rename_files(full_res_dir)
+		move_and_rename_files(full_res_dir)
 
 	with Path("test_split.txt").open("w") as f:
 		for datasetfile in os.listdir(full_res_dir):
