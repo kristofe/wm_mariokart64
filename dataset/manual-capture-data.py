@@ -15,6 +15,7 @@ import yaml
 import pygetwindow as gw
 from PIL import Image, ImageGrab
 import argparse
+import ctypes
 
 
 # Load configuration from YAML file
@@ -34,6 +35,8 @@ capture_interval = 0.05  # Capture every 0.05 seconds
 
 
 map_id = 0 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
+
+kb = keyboard.Controller()
 
 def list_open_windows():
 	# Get all open windows
@@ -113,13 +116,8 @@ def get_window_handle(window_name):
 
 
 def send_ctrl_c(hwnd):
-	# Press and hold Ctrl
-	win32api.SendMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_CONTROL, 0)
-	# Press and release 'C'
-	win32api.SendMessage(hwnd, win32con.WM_KEYDOWN, ord('C'), 0)
-	win32api.SendMessage(hwnd, win32con.WM_KEYUP, ord('C'), 0)
-	# Release Ctrl
-	win32api.SendMessage(hwnd, win32con.WM_KEYUP, win32con.VK_CONTROL, 0)
+	kb.press("k")
+	kb.release("k")
 
 
 def encode_inputs(keys_pressed):
