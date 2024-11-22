@@ -6,14 +6,16 @@ from PIL import Image
 from csgo.action_processing import CSGOAction
 from .dataset_env import DatasetEnv
 from .play_env import PlayEnv
-import matplotlib.pyplot as plt
+from IPython.display import display, clear_output
+from ipywidgets import widgets
 from IPython.display import clear_output
-import ipywidgets as widgets
 from IPython.display import display
+import asyncio
+import nest_asyncio
 
 
 steering_value = 0.0
-
+stop_task = False
 
 class ColabGame:
 	def __init__(
@@ -38,22 +40,48 @@ class ColabGame:
 		print("Esc : quit")
 		print("\n")
 
+	def on_slider_change(self, change):
+		global steering_value
+		steering_value = change['new']  # Update the global variable
+
+	def stop_monitoring(self, change):
+		global stop_task
+		stop_task = True  # Set the flag to stop the task
 
 	def run(self) -> None:
-		def draw_obs(obs, obs_low_res=None):
+		global stop_task
+		nest_asyncio.apply()
+
+		original_slider = widgets.FloatSlider(min=-1, max=1, step=0.1, value=0, description="Steering")
+		output = widgets.Output()
+		original_slider.observe(self.on_slider_change, names='value')
+		display(original_slider)
+
+		stop_button = widgets.Button(description="Stop Task")
+		stop_button.on_click(self.stop_monitoring)
+
+		# Display the output widget and stop button
+		display(output, stop_button)
+		stop_task = False
+		asyncio.create_task(self.async_run())
+
+	async def async_run(self) -> None:
+		global steering_value
+		async def draw_obs(obs, obs_low_res=None):
 			assert obs.ndim == 4 and obs.size(0) == 1
 			clear_output(wait=True)
-			#img = Image.fromarray(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy())
-			plt.imshow(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy(), interpolation='nearest')
-			plt.show()
-			display(slider)
+			img = Image.fromarray(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy())
+			display(img)
+			#plt.imshow(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy(), interpolation='nearest')
+			#plt.show()
+			#display(slider)
 			print(steering_value)
 			
 
-		def reset():
+		async def reset():
 			nonlocal obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click
 			global steering_value
-			obs, info = self.env.reset()
+			obs, info = await asyncio.to_thread(self.env.reset)
 			do_reset = False
 			ep_return = 0
 			ep_length = 0
@@ -61,37 +89,23 @@ class ColabGame:
 			steering_value = 0.0
 			l_click = r_click = False
 
-
-		steering_value = 0.0
-
-		slider = widgets.FloatSlider(
-			value=steering_value,  # Initial value of the slider
-			min=-1.0,  # Minimum value of the slider
-			max=1.0,  # Maximum value of the slider
-			step=0.1,  # Step size
-			description='Slider:',
-			continuous_update=True
-		)
-
-		display(slider)
-
-		reset()
+		print(steering_value)
+		await reset()
 		
 		obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click = (None,) * 8
-		should_stop = False
+		
 
-
-		while not should_stop:
+		while not stop_task:
 			if do_reset:
-				reset()
+				await reset()
 			do_wait = False
-			should_stop = False
+			await asyncio.sleep(0.01)
 			csgo_action = CSGOAction(steering_value)
-			next_obs, rew, end, trunc, info = self.env.step(csgo_action)
+			next_obs, rew, end, trunc, info = await asyncio.to_thread(self.env.step, csgo_action)
 
-			draw_obs(next_obs)
+			await draw_obs(next_obs)
 			if end or trunc:
-				reset()
+				await reset()
 
 			else:
 				obs = next_obs
