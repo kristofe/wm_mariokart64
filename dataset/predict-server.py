@@ -68,7 +68,7 @@ def capture_frame(prediction, img, do_boost):
 		h5file = h5py.File(root_folder + output_dir+"/"+h5file_name, 'w')	
 		t = 0
 		print("Saving hdf5 file and skipping to next...")
-	# Convert from BGRA to BGR (OpenCV format)
+	# Convert from RGBA to BGR (OpenCV format)
 	img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
 	vector = decimal_to_vector(prediction)

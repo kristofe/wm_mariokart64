@@ -161,8 +161,8 @@ def capture_frame(window_handle, h5file):
 	screenshot = ImageGrab.grabclipboard()
 	img = np.array(screenshot)
 	# During this convertion to array the color channels are swapped into BGRA
-	# Convert from BGRA to BGR (OpenCV format)
-	img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+	# Convert from RGBA to BGR (OpenCV format)
+	img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
 	#cv2.imwrite(f"{output_dir}/frame_{t}.png", img)
 	
