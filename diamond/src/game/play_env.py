@@ -3,7 +3,7 @@ import math
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-import pygame
+
 import torch
 from torch import Tensor
 

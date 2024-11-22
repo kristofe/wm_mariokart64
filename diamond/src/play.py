@@ -11,8 +11,10 @@ from agent import Agent
 from envs import WorldModelEnv
 from game import Game, PlayEnv, ColabGame
 
-
+OmegaConf.clear_resolvers()
 OmegaConf.register_new_resolver("eval", eval)
+
+
 
 
 def parse_args() -> argparse.Namespace:
@@ -99,10 +101,12 @@ def main():
 	env = prepare_play_mode(cfg, args)
 	if args.colab:
 		colab_game = ColabGame(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header)
+		colab_game.run()
 	else:
 		game = Game(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header)
 		game.run()
 
 
 if __name__ == "__main__":
+	
 	main()
