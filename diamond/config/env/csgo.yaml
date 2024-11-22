@@ -1,7 +1,7 @@
 train:
   id: csgo
   size: [320, 240]
-num_actions: 20
+num_actions: 39
 path_data_low_res: <REMEMBER TO EDIT THIS>
 path_data_full_res: <REMEMBER TO EDIT THIS>
 keymap: csgo
