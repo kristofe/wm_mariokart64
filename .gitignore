@@ -5,3 +5,6 @@ dataset/csgo_dataset/
 *.pyc
 dataset/BizHawk/
 dataset/NeuralKart-master/
+diamond/cache
+diamond/processed
+diamond/trained
