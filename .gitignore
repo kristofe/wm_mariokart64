@@ -8,3 +8,4 @@ dataset/NeuralKart-master/
 diamond/cache
 diamond/processed
 diamond/trained
+diamond/outputs/

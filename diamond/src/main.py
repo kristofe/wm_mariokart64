@@ -29,7 +29,7 @@ def main(cfg: DictConfig) -> None:
 	
 	cfg.upsampler.training.grad_acc_steps = int(input("UPSAMPLER Grad acc steps: "))
 	cfg.upsampler.training.batch_size = int(input("UPSAMPLER batch size: "))
-	buffer = input("path_data_low_res: [default: {cfg.env.path_data_low_res}]")
+	buffer = input(f"path_data_low_res: [default: {cfg.env.path_data_low_res}]")
 	if buffer and buffer != "":
 		cfg.env.path_data_low_res = buffer
 	print(cfg.env.path_data_low_res)
