@@ -26,6 +26,7 @@ from utils import (
 	get_lr_sched,
 	keep_agent_copies_every,
 	Logs,
+	move_opt_to,
 	process_confusion_matrices_if_any_and_compute_classification_metrics,
 	save_info_for_import_script,
 	save_with_backup,
@@ -48,8 +49,6 @@ class Trainer(StateDictMixin):
 		set_seed(torch.seed() % 10 ** 9)
 
 		# Device
-		torch.zeros(1).cuda()
-		print(torch.cuda.is_available())
 		self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu", self._rank)
 		print(f"Starting on {self._device}")
 		self._use_cuda = self._device.type == "cuda"
@@ -115,7 +114,7 @@ class Trainer(StateDictMixin):
 		self.test_dataset.load_from_default_path()
 
 		# Create models
-		self.agent = Agent(instantiate(cfg.agent, num_actions=num_actions)).to(self._device)
+		self.agent = Agent(instantiate(cfg.agent, num_actions=num_actions))
 		self._agent = build_ddp_wrapper(**self.agent._modules) if dist.is_initialized() else self.agent
 
 		if cfg.initialization.path_to_ckpt is not None:
@@ -385,6 +384,10 @@ class Trainer(StateDictMixin):
 		lr_sched = self.lr_sched.get(name)
 		data_loader = self._data_loader_train.get(name)
 
+		torch.cuda.empty_cache()
+		model.to(self._device)
+		move_opt_to(opt, self._device)
+
 		model.train()
 		opt.zero_grad()
 		data_iterator = iter(data_loader) if data_loader is not None else None
@@ -403,7 +406,7 @@ class Trainer(StateDictMixin):
 
 			if (i + 1) % cfg.grad_acc_steps == 0:
 				if cfg.max_grad_norm is not None:
-					grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.max_grad_norm)
+					grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.max_grad_norm).item()
 					metrics["grad_norm_before_clip"] = grad_norm
 
 				opt.step()
@@ -417,6 +420,10 @@ class Trainer(StateDictMixin):
 
 		process_confusion_matrices_if_any_and_compute_classification_metrics(to_log)
 		to_log = [{f"{name}/train/{k}": v for k, v in d.items()} for d in to_log]
+
+		model.to("cpu")
+		move_opt_to(opt, "cpu")
+
 		return to_log
 
 	@torch.no_grad()
@@ -424,6 +431,7 @@ class Trainer(StateDictMixin):
 		model = getattr(self.agent, name)
 		data_loader = self._data_loader_test.get(name)
 		model.eval()
+		model.to(self._device)
 		to_log = []
 		for batch in tqdm(data_loader, desc=f"Evaluating {name}"):
 			batch = batch.to(self._device)
@@ -435,6 +443,7 @@ class Trainer(StateDictMixin):
 
 		process_confusion_matrices_if_any_and_compute_classification_metrics(to_log)
 		to_log = [{f"{name}/test/{k}": v for k, v in d.items()} for d in to_log]
+		model.to("cpu")
 		return to_log
 
 	def load_state_checkpoint(self) -> None:
