@@ -30,11 +30,9 @@ target_height = config.get("target_height", 240)
 # Initialize some variables
 frames_data = []
 keys_pressed = []
-output_dir = "recordings/" + datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+output_dir = "./recordings/" + datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
 capture_interval = 0.05  # Capture every 0.05 seconds
 
-
-map_id = 0 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
 
 kb = keyboard.Controller()
 
@@ -70,9 +68,7 @@ keybinds = config.get("keybinds", {})
 
 # Map key bindings to valid_keys array in a specific order, parsing each key
 valid_keys = [
-	parse_key(keybinds.get("forward", "w")),
 	parse_key(keybinds.get("left", "a")),
-	parse_key(keybinds.get("backwards", "s")),
 	parse_key(keybinds.get("right", "d")),
 	parse_key(keybinds.get("use", "enter")),
 ]
@@ -123,26 +119,19 @@ def send_ctrl_c(hwnd):
 def encode_inputs(keys_pressed):
 
 	# Initialize one-hot vectors
-	movement_vector = [0, 0, 0]  # 5 elements for movement keys
+	movement_vector = [0]  # Whether it is boosting in the current frame or not.
 	direction_vector = [0] * 20        # 20 elements for direction keys
 
-	if "a" in keys_pressed:
-		movement_vector[0] = 1
-	if "s" in keys_pressed:
-		movement_vector[1] = 1
 	if "d" in keys_pressed:
-		movement_vector[2] = 1
+		movement_vector[0] = [1]
 
 	if keyboard.Key.left in keys_pressed:
 		direction_vector[0] = 1
 	if keyboard.Key.right in keys_pressed:
 		direction_vector[-1] = 1
 
-	map_selector = [0] * 16 #OneHot Representation of the map index.
-	map_selector[map_id] = 1
-
 	# Concatenate the two vectors
-	encoded_vector = movement_vector + direction_vector + map_selector
+	encoded_vector = movement_vector + direction_vector
 
 	return encoded_vector
 

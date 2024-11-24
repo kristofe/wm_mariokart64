@@ -8,6 +8,7 @@ import random
 import datetime
 import h5py
 import cv2
+from train import create_model, is_valid_track_code, INPUT_WIDTH, INPUT_HEIGHT, INPUT_CHANNELS
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -16,15 +17,12 @@ file_index = 0
 h5file = None
 output_dir = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
 file_prefix = output_dir
-from train import create_model, is_valid_track_code, INPUT_WIDTH, INPUT_HEIGHT, INPUT_CHANNELS
+
 root_folder = "./recordings/"
 created_folder = False
 BOOST_CHANCE = 100
 target_width = 320
 target_height = 240
-
-static_input_vector = [1, 0, 0] #NeuralKart always accelerates and never brakes or uses action items.
-map_id = 1 #For more information refer to https://github.com/Dere-Wah/AI-MarioKart64/tree/main/dataset#track-mapping-table
 
 noise_mode = False
 
@@ -63,8 +61,6 @@ def capture_frame(prediction, img, do_boost):
 		if h5file != None:
 			h5file.close()
 		h5file_name = file_prefix+"_"+str(file_index)+".hdf5"
-		if noise_mode:
-			h5file_name = "noised_" + h5file_name
 		h5file = h5py.File(root_folder + output_dir+"/"+h5file_name, 'w')	
 		t = 0
 		print("Saving hdf5 file and skipping to next...")
@@ -72,16 +68,14 @@ def capture_frame(prediction, img, do_boost):
 	img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
 	vector = decimal_to_vector(prediction)
-	map_selector = [0] * 16 #OneHot Representation of the map index.
-	map_selector[map_id] = 1
 	
-	inputs_vector = static_input_vector
+	
 	if do_boost:
-		inputs_vector[2] = 1
+		inputs_vector = [1]
 	else:
-		inputs_vector[2] = 0
+		inputs_vector = [0]
 
-	onehot = inputs_vector + vector + map_selector
+	onehot = inputs_vector + vector
 	print(onehot)
 	#cv2.imwrite(f"{output_dir}/frame_{t}_{str(list(vector))}.png", img)
 	h5file.create_dataset("frame_"+str(t)+"_x", data=img)
@@ -135,7 +129,6 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Start a prediction server that other apps will call into.')
 	parser.add_argument('-a', '--all', action='store_true', help='Use the combined weights for all tracks, rather than selecting the weights file based off of the course code sent by the Play.lua script.', default=False)
 	parser.add_argument('-p', '--port', type=int, help='Port number', default=36296)
-	parser.add_argument('--map_id', type=int, help='Map index', required=True)
 	parser.add_argument('--boost', type=int, help='Boosting chance', default=100)
 	parser.add_argument('-c', '--cpu', action='store_true', help='Force Tensorflow to use the CPU.', default=False)
 	parser.add_argument("--add_noise", action="store_true", help="Add random movement noise to the agent outputs.")
