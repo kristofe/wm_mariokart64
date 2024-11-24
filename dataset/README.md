@@ -15,64 +15,12 @@ Each `.hdf5` file contains **1000 frames**, indexed from `0` to `999`. Each fram
     - Three color channels in **BGR format**.  
 
 2. **`frame_<i>_y`:** Player input data.  
-    - **First 3 values**:  
-        - `1`: Acceleration.  
-        - `2`: Braking.  
-        - `3`: Using an active item.  
-
     - **Next 20 values**:  
         - One-hot vector representing steering direction.  
         - Gradual steering (e.g., intermediate values between full left and full right).  
         - Manual data only captures **complete steering** left or right.
-
-    - **Last 16 values**:  
-        - Experimental parameters encoding the **current track** using a OneHot representation
-        - 16-bit onehot value (e.g., `1000000000000000`, `0100000000000000`), mapping to 16 tracks.
-        - Onehot is preferred over a 4-bits representation because it allows multiple maps to be "enabled" in the future, to mix them together.
-        - The goal: dynamically modify the environment by switching track parameters.  
-
----
-
-### **Track Mapping Table**
-
-
-### **Mushroom Cup**
-| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
-|---------------------------|-------------|-----------------------|
-| 1000000000000000           | 0           | Luigi Raceway         |
-| 0100000000000000           | 1           | Moo Moo Farm          |
-| 0010000000000000           | 2           | Koopa Troopa Beach    |
-| 0001000000000000           | 3           | Kalimari Desert       |
-
----
-
-### **Fire Flower Cup**
-| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
-|---------------------------|-------------|-----------------------|
-| 0000100000000000           | 4           | Toad's Turnpike       |
-| 0000010000000000           | 5           | Frappe Snowland       |
-| 0000001000000000           | 6           | Choco Mountain        |
-| 0000000100000000           | 7           | Mario Raceway         |
-
----
-
-### **Star Cup**
-| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
-|---------------------------|-------------|-----------------------|
-| 0000000010000000           | 8           | Wario Stadium         |
-| 0000000001000000           | 9           | Sherbet Land          |
-| 0000000000100000           | 10          | Royal Raceway         |
-| 0000000000010000           | 11          | Bowser's Castle       |
-
----
-
-### **Special Cup**
-| **Track OneHot (16-bit)**  | **Decimal** | **Track Name**        |
-|---------------------------|-------------|-----------------------|
-| 0000000000001000           | 12          | D.K.'s Jungle Parkway |
-| 0000000000000100           | 13          | Yoshi Valley          |
-| 0000000000000010           | 14          | Banshee Boardwalk     |
-| 0000000000000001           | 15          | Rainbow Road          |
+    - **Last value**:  
+        - `1`: Using Boost
 
 ---
 
@@ -102,7 +50,7 @@ Each `.hdf5` file contains **1000 frames**, indexed from `0` to `999`. Each fram
 ### **Step 2: Setup BizHawk QuickStates**
 The `Play.Lua` script automatically resets the game to the quickstate in slot 1 when the track has completed 3 laps.
 
-Make sure to save a State in that slot at the beginning of the race, to allow the script to reset.
+Make sure to save a State in that slot at the beginning of the race, to allow the script to reset. To do so press SHIFT + F1 when the race starts.
 
 This dataset collection format only currently supports "screenshot mode". (It is enabled by default, so you should not encounter any issue with this.)
 ---
@@ -113,13 +61,12 @@ This dataset collection format only currently supports "screenshot mode". (It is
 3. Run the script to start the prediction server.  
 4. You can run the script with custom parameters: 
    - `--boost=<x>` is the probability 1/x that boost is used
-   - `--map_id=<x>` specifies which track you are going to play. Refer to the table above to view the mapping.
 
 ---
 
 ## **Setup - Manual Playing**
 
-In order to capture a good dataset, some track laps should be manually recorded. In these tracks you should focus on collecting input on "corner cases": basically stuff that rarely happens in gameplay but behaviour that you still want to implement. An example is going against walls: if there is no data about how bumping works the model will blur this type of actions. Same goes for going against a tree, falling off a map, going backwards, steering and accelerating at the same time, steering while being at a full stop, using action items when you have none, etc.
+In order to capture a good dataset, some track laps should be manually recorded. In these tracks you should focus on collecting input on "corner cases": basically stuff that rarely happens in gameplay but behaviour that you still want to implement. An example is going against walls: if there is no data about how bumping works the model will blur this type of actions. Same goes for going against a tree, falling off a map, going backwards, etc. Try to use only actions that are captured by the dataset, so turning + using boost, & always accelerate.
 
 Configure `manual-config.yaml` to your needs. You can leave input values as default. For the game window name, if you're not sure leave it as is.
 
@@ -130,9 +77,5 @@ Run `manual-capture-data.py`. If you put in the wrong window name it will throw 
 If you get an error about capturing screenshots, first try and capturing a screenshot on your own in bizhawk (press ctrl+C), then restart the script.
 
 To stop the script press ESC.
-
-### **Additional Notes**
-- Always ensure the `.state` file is correctly configured in `Play.lua`.  
-- The dynamic map shaping using binary parameters for tracks is experimental and subject to improvement.  
 
 ---
