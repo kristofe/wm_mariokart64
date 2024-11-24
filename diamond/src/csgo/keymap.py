@@ -8,4 +8,5 @@ CSGO_KEYMAP = {
     pygame.K_q: "switch_map",
     pygame.K_RIGHT: "right",
     pygame.K_LEFT: "left",
+    pygame.K_r: "next_map"
 }

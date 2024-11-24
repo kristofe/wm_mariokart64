@@ -161,12 +161,14 @@ class Game:
 			if do_wait and not do_one_step:
 				continue
 
+			steering_value = 0.0
 			if pygame.K_LEFT in keys_pressed:
 				steering_value = -1.0
 			elif pygame.K_RIGHT in keys_pressed:
 				steering_value = 1.0
+				
 			
-			if pygame.K_R in keys_pressed:
+			if pygame.K_r in keys_pressed:
 				map_id += 1
 				if map_id >= 2:
 					map_id = 0

@@ -28,6 +28,11 @@ def parse_args() -> argparse.Namespace:
 	parser.add_argument("--colab", action="store_true", help="Run the model on COLAB, without using PyGame.")
 	parser.add_argument("--fps", type=int, default=15, help="Frame rate.")
 	parser.add_argument("--no-header", action="store_true")
+	parser.add_argument(
+		"--model",
+		type=Path,
+		help="If you want to use a custom model, specify the directory.",
+	)
 	return parser.parse_args()
 
 
@@ -38,8 +43,10 @@ def check_args(args: argparse.Namespace) -> None:
 
 
 def prepare_play_mode(cfg: DictConfig, args: argparse.Namespace) -> PlayEnv:
-
-	path_hf =  Path(snapshot_download(repo_id="DereWah/diamond-mariokart64", allow_patterns="csgo/*"))
+	if args.model == "" or args.model == None:
+		path_hf =  Path(snapshot_download(repo_id="DereWah/diamond-mariokart64", allow_patterns="csgo/*"))
+	else:
+		path_hf = args.model
 	# If you're running with a model that you already downloaded. simply change this path above to match the folder in which you put the model
 	path_ckpt = path_hf / "csgo/model/csgo.pt"
 	spawn_dir = path_hf / "csgo/spawn"

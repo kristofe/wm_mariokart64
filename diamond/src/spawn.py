@@ -55,7 +55,7 @@ def main():
 			# Append each frame to the lists
 			data_x = h5file[frame_x][:]
 			data_y = h5file[frame_y][:]
-			#data_x = cv2.cvtColor(data_x, cv2.COLOR_BGR2RGB)
+			data_x = cv2.cvtColor(data_x, cv2.COLOR_BGR2RGB)
 			
 			data_x_frames.append(data_x)
 			data_y_frames.append(data_y)

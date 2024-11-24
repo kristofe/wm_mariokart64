@@ -12,6 +12,7 @@ from csgo.action_processing import CSGOAction, decode_csgo_action, encode_csgo_a
 from csgo.keymap import CSGO_KEYMAP
 from data import Dataset, Episode
 from envs import WorldModelEnv
+import pygame
 
 
 NamedEnv = namedtuple("NamedEnv", "name env")
