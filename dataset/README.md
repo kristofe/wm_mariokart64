@@ -15,7 +15,7 @@ Each `.hdf5` file contains **1000 frames**, indexed from `0` to `999`. Each fram
     - Three color channels in **BGR format**.  
 
 2. **`frame_<i>_y`:** Player input data.  
-    - **Next 20 values**:  
+    - **First 21 values**:  
         - One-hot vector representing steering direction.  
         - Gradual steering (e.g., intermediate values between full left and full right).  
         - Manual data only captures **complete steering** left or right.

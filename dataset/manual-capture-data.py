@@ -127,9 +127,11 @@ def encode_inputs(keys_pressed):
 
 	if keyboard.Key.left in keys_pressed:
 		direction_vector[0] = 1
-	if keyboard.Key.right in keys_pressed:
+	elif keyboard.Key.right in keys_pressed:
 		direction_vector[-1] = 1
-
+	else:
+		direction_vector[9] = 1
+		
 	# Concatenate the two vectors
 	encoded_vector = movement_vector + direction_vector
 

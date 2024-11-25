@@ -78,7 +78,7 @@ class Game:
 				# screen.blit(surface, (x_center - w // 2, y_center + self.height // 2))
 
 		def reset():
-			nonlocal obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click, steering_value, map_id
+			nonlocal obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click, steering_value
 			obs, info = self.env.reset()
 			pygame.event.clear()
 			do_reset = False
@@ -167,14 +167,7 @@ class Game:
 			elif pygame.K_RIGHT in keys_pressed:
 				steering_value = 1.0
 				
-			
-			if pygame.K_r in keys_pressed:
-				map_id += 1
-				if map_id >= 2:
-					map_id = 0
-			# This should be edited to be able to change and activate / deactivate multiple maps at once
-
-			csgo_action = CSGOAction(keys_pressed, steering_value, map_id)
+			csgo_action = CSGOAction(keys_pressed, steering_value)
 			next_obs, rew, end, trunc, info = self.env.step(csgo_action)
 
 			ep_return += rew.item()

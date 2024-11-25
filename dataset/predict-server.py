@@ -33,24 +33,34 @@ def prepare_image(im):
 	im_arr = np.expand_dims(im_arr, axis=0)
 	return im_arr
 	
-def decimal_to_vector(decimal_number):
-    # Initialize a list of 20 zeros
-    vector = [0] * 20
-    
-    # Ensure the decimal_number is within the expected range
-    decimal_number = max(-1.0, min(decimal_number, 1.0))
-    
-    # Calculate the index based on the input decimal number
-    # Map -1.0 to 0, -0.9 to 1, ..., 0.0 to 10, ..., 0.9 to 19, 1.0 to 19
-    index = round((decimal_number + 1.0) * 10)
-    
-    # Cap the index at 19 to handle the case where decimal_number is exactly 1.0
-    index = min(index, 19)
-    
-    # Set the appropriate position in the vector to 1
-    vector[index] = 1
-    
-    return vector
+def decimal_to_index(decimal_value):
+    """
+    Converts a decimal value to its corresponding index based on the table.
+
+    Args:
+        decimal_value (float): The decimal value to convert.
+
+    Returns:
+        int: The corresponding index, or None if the value is not in the range.
+    """
+    decimals = [-1.0 + 0.1 * i for i in range(21)]
+    if decimal_value in decimals:
+        return decimals.index(decimal_value)
+    return None
+
+def index_to_decimal(index):
+    """
+    Converts an index to its corresponding decimal value based on the table.
+
+    Args:
+        index (int): The index to convert.
+
+    Returns:
+        float: The corresponding decimal value, or None if the index is out of range.
+    """
+    if 0 <= index < 21:
+        return -1.0 + 0.1 * index
+    return None
 	
 def capture_frame(prediction, img, do_boost):
 	global t
@@ -67,8 +77,8 @@ def capture_frame(prediction, img, do_boost):
 	# Convert from RGBA to BGR (OpenCV format)
 	img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
 	img = cv2.resize(img, (target_width, target_height))
-	vector = decimal_to_vector(prediction)
-	
+	vector = [0] * 21
+	vector[decimal_to_index(prediction)] = 1
 	
 	if do_boost:
 		inputs_vector = [1]
