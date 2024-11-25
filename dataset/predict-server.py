@@ -1,3 +1,7 @@
+"""
+Credits: some parts are taken and modified from the file `predict-server.py` from https://github.com/rameshvarun/NeuralKart
+"""
+
 import sys, time, logging, os, argparse
 
 import numpy as np
