@@ -120,7 +120,7 @@ def encode_inputs(keys_pressed):
 
 	# Initialize one-hot vectors
 	movement_vector = [0]  # Whether it is boosting in the current frame or not.
-	direction_vector = [0] * 20        # 20 elements for direction keys
+	direction_vector = [0] * 21        # 20 elements for direction keys
 
 	if "d" in keys_pressed:
 		movement_vector[0] = [1]
@@ -130,10 +130,10 @@ def encode_inputs(keys_pressed):
 	elif keyboard.Key.right in keys_pressed:
 		direction_vector[-1] = 1
 	else:
-		direction_vector[9] = 1
+		direction_vector[10] = 1
 		
 	# Concatenate the two vectors
-	encoded_vector = movement_vector + direction_vector
+	encoded_vector = direction_vector + movement_vector
 
 	return encoded_vector
 

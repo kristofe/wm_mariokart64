@@ -89,7 +89,7 @@ def capture_frame(prediction, img, do_boost):
 	else:
 		inputs_vector = [0]
 
-	onehot = inputs_vector + vector
+	onehot = vector + inputs_vector
 	print(onehot)
 	#cv2.imwrite(f"{output_dir}/frame_{t}_{str(list(vector))}.png", img)
 	h5file.create_dataset("frame_"+str(t)+"_x", data=img)
@@ -149,7 +149,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	noise_mode = args.add_noise
-	map_id = args.map_id
 	BOOST_CHANCE = args.boost
 	if args.cpu:
 		os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
