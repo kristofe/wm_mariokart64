@@ -52,9 +52,9 @@ class ColabGame:
 	def run(self) -> None:
 		global steering_value, output
 
-		
+
 		output = widgets.Output()
-		
+		display(output)
 		def draw_obs(obs, obs_low_res=None):
 			assert obs.ndim == 4 and obs.size(0) == 1
 			img = Image.fromarray(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy())
