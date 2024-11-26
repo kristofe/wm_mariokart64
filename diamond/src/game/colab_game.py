@@ -100,7 +100,7 @@ class ColabGame:
 				await reset()
 			do_wait = False
 			await asyncio.sleep(0.01)
-			csgo_action = CSGOAction(steering_value)
+			csgo_action = CSGOAction([], steering_value)
 			next_obs, rew, end, trunc, info = await asyncio.to_thread(self.env.step, csgo_action)
 
 			await draw_obs(next_obs)

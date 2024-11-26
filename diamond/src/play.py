@@ -43,17 +43,20 @@ def check_args(args: argparse.Namespace) -> None:
 
 
 def prepare_play_mode(cfg: DictConfig, args: argparse.Namespace) -> PlayEnv:
+
+	model_name = input("Model name: ")
+
 	if args.model == "" or args.model == None:
-		path_hf =  Path(snapshot_download(repo_id="DereWah/diamond-mariokart64", allow_patterns="csgo/*"))
+		path_hf =  Path(snapshot_download(repo_id="DereWah/diamond-mariokart64", allow_patterns=f"{model_name}/*"))
 	else:
 		path_hf = args.model
 	# If you're running with a model that you already downloaded. simply change this path above to match the folder in which you put the model
-	path_ckpt = path_hf / "csgo/model/csgo.pt"
-	spawn_dir = path_hf / "csgo/spawn"
+	path_ckpt = path_hf / f"{model_name}/model/{model_name}.pt"
+	spawn_dir = path_hf / f"{model_name}/spawn"
 
 	# Override config
-	cfg.agent = OmegaConf.load(path_hf / "csgo/config/agent/csgo.yaml")
-	cfg.env = OmegaConf.load(path_hf / "csgo/config/env/csgo.yaml")
+	cfg.agent = OmegaConf.load(path_hf / f"{model_name}/config/agent/{model_name}.yaml")
+	cfg.env = OmegaConf.load(path_hf / f"{model_name}/config/env/{model_name}.yaml")
 
 	if torch.cuda.is_available():
 		device = torch.device("cuda:0")
@@ -62,7 +65,7 @@ def prepare_play_mode(cfg: DictConfig, args: argparse.Namespace) -> PlayEnv:
 	else:
 		device = torch.device("cpu")
 
-	assert cfg.env.train.id == "csgo"
+	assert cfg.env.train.id == f"{model_name}"
 	num_actions = cfg.env.num_actions
 
 	# Models

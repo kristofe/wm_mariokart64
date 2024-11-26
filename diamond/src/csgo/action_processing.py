@@ -27,7 +27,7 @@ class CSGOAction:
 def print_csgo_action(action: CSGOAction) -> Tuple[str]:
 	action_names = [CSGO_KEYMAP[k] for k in action.keys] if len(action.keys) > 0 else []
 	keys = " + ".join(action_names)
-	return f"{keys} [Steering {action.steering_value}] | MAP: {action.map_id}"
+	return f"{keys} [Steering {action.steering_value}]"
 	
 
 def decimal_to_index(decimal_value):
