@@ -86,7 +86,7 @@ class ColabGame:
 			do_wait = False
 			csgo_action = CSGOAction([], steering_value)
 			next_obs, rew, end, trunc, info = self.env.step(csgo_action)
-			time.sleep(0.01)
+			time.sleep(0.1)
 			draw_obs(next_obs)
 			if end or trunc:
 				reset()
