@@ -16,6 +16,7 @@ import nest_asyncio
 
 steering_value = 0.0
 stop_task = False
+output = None
 
 class ColabGame:
 	def __init__(
@@ -49,7 +50,7 @@ class ColabGame:
 		stop_task = True  # Set the flag to stop the task
 
 	def run(self) -> None:
-		global stop_task
+		global stop_task, output
 		nest_asyncio.apply()
 
 		output = widgets.Output()
@@ -69,13 +70,15 @@ class ColabGame:
 		global steering_value
 		async def draw_obs(obs, obs_low_res=None):
 			assert obs.ndim == 4 and obs.size(0) == 1
-			clear_output(wait=True)
 			img = Image.fromarray(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy())
-			display(img)
+
+			with output:
+				clear_output(wait=True)
+				display(img)
 			#plt.imshow(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy(), interpolation='nearest')
 			#plt.show()
 			#display(slider)
-			print(steering_value)
+
 			
 
 		async def reset():
@@ -89,7 +92,6 @@ class ColabGame:
 			steering_value = 0.0
 			l_click = r_click = False
 
-		print(steering_value)
 		await reset()
 		
 		obs, info, do_reset, ep_return, ep_length, keys_pressed, l_click, r_click = (None,) * 8
