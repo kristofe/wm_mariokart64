@@ -55,9 +55,8 @@ class ColabGame:
 			assert obs.ndim == 4 and obs.size(0) == 1
 			img = Image.fromarray(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy())
 
-			with output:
-				clear_output(wait=True)
-				display(img)
+			clear_output(wait=True)
+			display(img)
 			#plt.imshow(obs[0].add(1).div(2).mul(255).byte().permute(1, 2, 0).cpu().numpy(), interpolation='nearest')
 			#plt.show()
 			#display(slider)
