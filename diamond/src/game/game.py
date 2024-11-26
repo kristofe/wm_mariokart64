@@ -8,6 +8,9 @@ from csgo.action_processing import CSGOAction
 from .dataset_env import DatasetEnv
 from .play_env import PlayEnv
 
+from IPython.display import clear_output, display
+from ipywidgets import widgets
+
 
 class Game:
 	def __init__(
@@ -17,13 +20,14 @@ class Game:
 		mouse_multiplier: int,
 		fps: int,
 		verbose: bool,
+		use_colab: bool = False
 	) -> None:
 		self.env = play_env
 		self.height, self.width = size
 		self.mouse_multiplier = mouse_multiplier
 		self.fps = fps
 		self.verbose = verbose
-
+		self.use_colab = use_colab
 		self.env.print_controls()
 		print("\nControls:\n")
 		print(" m  : switch control (human/replay)") # Not for main as Game can use either PlayEnv or DatasetEnv
@@ -36,6 +40,9 @@ class Game:
 
 	def run(self) -> None:
 		pygame.init()
+		output = None
+		if self.use_colab:
+			output = widgets.Output()
 
 		header_height = 150 if self.verbose else 0
 		header_width = 540
@@ -66,6 +73,11 @@ class Game:
 			pygame_image = np.array(img.resize((self.width, self.height), resample=Image.BICUBIC)).transpose((1, 0, 2))
 			surface = pygame.surfarray.make_surface(pygame_image)
 			screen.blit(surface, (x_center - self.width // 2, y_center - self.height // 2))
+
+			if(self.use_colab):
+				with output:
+					clear_output(wait=True)
+					display(img)
 
 			if obs_low_res is not None:
 				assert obs_low_res.ndim == 4 and obs_low_res.size(0) == 1

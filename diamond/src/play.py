@@ -109,12 +109,9 @@ def main():
 	w, h = (cfg.env.train.size,) * 2 if isinstance(cfg.env.train.size, int) else cfg.env.train.size
 	size_h, size_w = h * args.size_multiplier, w * args.size_multiplier
 	env = prepare_play_mode(cfg, args)
-	if args.colab:
-		colab_game = ColabGame(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header)
-		colab_game.run()
-	else:
-		game = Game(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header)
-		game.run()
+
+	game = Game(env, (size_h, size_w), args.mouse_multiplier, fps=args.fps, verbose=not args.no_header, use_colab=args.colab)
+	game.run()
 
 
 if __name__ == "__main__":
