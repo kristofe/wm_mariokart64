@@ -52,16 +52,16 @@ class ColabGame:
 		global stop_task
 		nest_asyncio.apply()
 
-		original_slider = widgets.FloatSlider(min=-1, max=1, step=0.1, value=0, description="Steering")
 		output = widgets.Output()
-		original_slider.observe(self.on_slider_change, names='value')
-		display(original_slider)
 
+		original_slider = widgets.FloatSlider(min=-1, max=1, step=0.1, value=0, description="Steering")
+		original_slider.observe(self.on_slider_change, names='value')
+		
 		stop_button = widgets.Button(description="Stop Task")
 		stop_button.on_click(self.stop_monitoring)
 
 		# Display the output widget and stop button
-		display(output, stop_button)
+		display(original_slider, output, stop_button)
 		stop_task = False
 		asyncio.create_task(self.async_run())
 
