@@ -79,3 +79,16 @@ If you get an error about capturing screenshots, first try and capturing a scree
 To stop the script press ESC.
 
 ---
+
+# **Contributing**
+
+If you have collected a dataset on a map that still isn't present on [HuggingFace](https://huggingface.co/datasets/DereWah/mk64-steering/tree/main), please consider contributing and uploading your dataset. The dataset should be of good quality, and should contain:
+- Full Resolution frames of 320x240, with color format BGR.
+- Action array of length 22, with 21 steering values and 1 boosting value.
+- minimum 2 .tar.gz files containing:
+    1. **Noised dataset** (with random inputs and non-expert behaviour, going against walls and turning)
+    2. **Expert dataset** with expert control on the map.
+    3. **Optional corner dataset** capture manual gameplay on the map with "corner"  cases such as reversing or exploring less common parts of the track.
+- The file structure and name formatting should reflect the one from already existing datasets on the repo. Look at the original [LR dataset](https://huggingface.co/datasets/DereWah/mk64-steering/tree/main/LR) for a guideline.
+
+You can message me on discord @DereWah or ping me on the [Diamond Discord](https://discord.gg/uMF94QreGc) to discuss further your contribution to this dataset.
