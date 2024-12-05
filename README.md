@@ -13,7 +13,9 @@ https://www.youtube.com/watch?v=c2CpUxQxDI4&ab_channel=DereDev
 
 ---
 
-https://colab.research.google.com/drive/1B63q1QSxadEPbkkzpMV6WR_R3ZBj-cXk?usp=sharing
+<a target="_blank" href="https://colab.research.google.com/github/Dere-Wah/AI-MarioKart64/blob/main/colab/AIMK64.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 ## Running the Model
 
