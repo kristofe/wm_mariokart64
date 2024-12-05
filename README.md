@@ -13,6 +13,8 @@ https://www.youtube.com/watch?v=c2CpUxQxDI4&ab_channel=DereDev
 
 ---
 
+https://colab.research.google.com/drive/1B63q1QSxadEPbkkzpMV6WR_R3ZBj-cXk?usp=sharing
+
 ## Running the Model
 
 ### Steps to Run the Model
