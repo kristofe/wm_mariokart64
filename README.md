@@ -1,8 +1,6 @@
-
 # AI-MarioKart64
 
 **Training DIAMOND to play MarioKart64 using a Neural Network**
-
 https://www.youtube.com/watch?v=c2CpUxQxDI4&ab_channel=DereDev
 
 ## Table of Contents
@@ -11,6 +9,11 @@ https://www.youtube.com/watch?v=c2CpUxQxDI4&ab_channel=DereDev
 - [Creating Spawns](#creating-spawns)
 - [Training on a Different Game](#training-on-a-different-game)
 
+---
+  <a href="https://derewah.dev/projects/ai-mariokart">
+    <img src="https://github.com/user-attachments/assets/6b9fa64d-d90c-47e8-ae4e-b1c511f89f4d" alt="Project" width="400">
+  </a>
+  
 ---
 
 <a target="_blank" href="https://colab.research.google.com/github/Dere-Wah/AI-MarioKart64/blob/main/colab/AIMK64.ipynb">
