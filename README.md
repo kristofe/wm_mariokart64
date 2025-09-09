@@ -76,6 +76,25 @@ https://www.youtube.com/watch?v=c2CpUxQxDI4&ab_channel=DereDev
    When running this, you'll be prompted again with the model name. Write the name of the model, which should be the name of the root folder of the model (and the same for the .pt file)
 ---
 
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="
+      https://api.star-history.com/svg?repos=Dere-Wah/AI-MarioKart64&type=Date&theme=dark
+    "
+  />
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="
+      https://api.star-history.com/svg?repos=Dere-Wah/AI-MarioKart64&type=Date
+    "
+  />
+  <img
+    alt="Star History Chart"
+    src="https://api.star-history.com/svg?repos=Dere-Wah/AI-MarioKart64&type=Date"
+  />
+</picture>
+
 ## Training the Model on a track
 
 A [google colab](https://colab.research.google.com/drive/1B63q1QSxadEPbkkzpMV6WR_R3ZBj-cXk?usp=sharing) notebook is available to train the model on a dataset with more ease. If you encounter any issue with the colab feel free to contact me on discord: @DereWah or open an issue here.
