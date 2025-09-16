@@ -3,6 +3,7 @@ dataset/recordings/
 dataset/csgo_dataset/
 **/__pycache__/
 *.pyc
+.venv/
 dataset/BizHawk/
 dataset/NeuralKart-master/
 diamond/cache
