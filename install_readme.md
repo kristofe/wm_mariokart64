@@ -79,6 +79,13 @@ If you need Atari environment support, install it separately:
 pip install "gymnasium[atari,accept-rom-license]"
 ```
 
+## Additional Dependencies
+
+The project also requires PyTorch and Jupyter/IPython support. These are included in the requirements.txt:
+
+- **PyTorch**: For deep learning models
+- **IPython/Jupyter**: For interactive development and display functions
+
 ## Troubleshooting
 
 ### Common Issues

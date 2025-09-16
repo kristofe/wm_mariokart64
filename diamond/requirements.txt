@@ -5,6 +5,14 @@ opencv-python==4.10.0.84
 pillow==10.3.0
 tqdm==4.66.4
 
+# PyTorch (install CPU version by default)
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Jupyter/IPython support
+ipython>=8.0.0
+jupyter>=1.0.0
+
 # Game and environment packages
 pygame==2.5.2
 gymnasium==0.29.1
