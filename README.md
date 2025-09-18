@@ -133,6 +133,19 @@ A [google colab](https://colab.research.google.com/drive/1B63q1QSxadEPbkkzpMV6WR
 
 5. **Optional:** When running the training script, you will be prompted with paths to the low res and full res datasets again. If you have already inserted them in the configuration file, you can just ignore these prompt and leave them empty. They will autocomplete to the config.
 
+6. **Monitor Training with TensorBoard**  
+   During training, you can monitor the loss curves and other metrics using TensorBoard. Each training run gets its own unique log directory:
+   ```bash
+   # Launch TensorBoard to view all runs (in a separate terminal)
+   ./scripts/launch_tensorboard.sh
+   
+   # Or view a specific run
+   ./scripts/view_run.sh <run_name>
+   ```
+   Then open your browser and go to `http://localhost:6006` to view the training plots.
+   
+   **Note**: Each training run creates a unique log directory with format `runs/{run_name}_{timestamp}`, so you can easily compare different training sessions.
+
 ---
 
 ## Creating Spawns

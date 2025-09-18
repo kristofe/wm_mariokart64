@@ -2,6 +2,7 @@ from functools import partial
 from pathlib import Path
 import shutil
 import time
+from datetime import datetime
 from typing import List, Optional, Tuple
 
 from hydra.utils import instantiate
@@ -10,6 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 import torch
 import torch.distributed as dist
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm, trange
 import wandb
 
@@ -59,6 +61,20 @@ class Trainer(StateDictMixin):
 			try_until_no_except(
 				partial(wandb.init, config=OmegaConf.to_container(cfg, resolve=True), reinit=True, resume=True, **cfg.wandb)
 			)
+
+		# Init TensorBoard with unique log directory
+		if self._rank == 0:
+			# Create unique log directory with timestamp and run name
+			timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+			run_name = cfg.wandb.get("name", "diamond_training")
+			# Clean run name for filesystem compatibility
+			run_name = "".join(c for c in run_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
+			run_name = run_name.replace(' ', '_')
+			log_dir = f"runs/{run_name}_{timestamp}"
+			self.tb_writer = SummaryWriter(log_dir=log_dir)
+			print(f"TensorBoard logs will be saved to: {log_dir}")
+		else:
+			self.tb_writer = None
 
 		# Flags
 		self._is_static_dataset = cfg.static_dataset.path is not None
@@ -284,6 +300,7 @@ class Trainer(StateDictMixin):
 			to_log.append({"duration": (time.time() - start_time) / 3600})
 			if self._rank == 0:
 				wandb_log(to_log, self.epoch)
+				self.log_to_tensorboard(to_log, self.epoch)
 			to_log = []
 
 			# Checkpointing
@@ -294,7 +311,13 @@ class Trainer(StateDictMixin):
 
 		# Last collect
 		if self._rank == 0 and not self._is_static_dataset:
-			wandb_log(self.collect_test(final=True), self.epoch)
+			final_logs = self.collect_test(final=True)
+			wandb_log(final_logs, self.epoch)
+			self.log_to_tensorboard(final_logs, self.epoch)
+
+		# Close TensorBoard writer
+		if self.tb_writer is not None:
+			self.tb_writer.close()
 
 	def collect_initial_dataset(self) -> Tuple[int, Logs]:
 		print("\nInitial collect\n")
@@ -445,3 +468,18 @@ class Trainer(StateDictMixin):
 			self.test_dataset.save_to_default_path()
 			self._keep_agent_copies(self.agent.state_dict(), self.epoch)
 			self._save_info_for_import_script(self.epoch)
+
+	def log_to_tensorboard(self, logs: List[dict], epoch: int) -> None:
+		"""Log metrics to TensorBoard"""
+		if self.tb_writer is None:
+			return
+		
+		for log_dict in logs:
+			for key, value in log_dict.items():
+				if isinstance(value, (int, float)):
+					self.tb_writer.add_scalar(key, value, epoch)
+				elif isinstance(value, dict) and "confusion_matrix" in key:
+					# Skip confusion matrices for now to keep it simple
+					continue
+		
+		self.tb_writer.flush()

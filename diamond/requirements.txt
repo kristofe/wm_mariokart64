@@ -25,5 +25,8 @@ wandb==0.17.0
 # PyTorch evaluation
 torcheval==0.0.7
 
+# TensorBoard for logging
+tensorboard==2.16.2
+
 # Optional: Atari support (install separately if needed)
 # gymnasium[atari,accept-rom-license]==0.29.1
