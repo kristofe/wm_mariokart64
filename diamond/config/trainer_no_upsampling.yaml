@@ -1,0 +1,105 @@
+defaults:
+  - _self_
+  - env: csgo
+  - agent: csgo
+  - world_model_env: fast
+
+hydra:
+  job:
+    chdir: True
+
+wandb:
+  mode: disabled
+  project: null
+  entity: null
+  name: "no_upsampling"
+  group: null
+  tags: null
+  notes: null
+
+initialization:
+  path_to_ckpt: null
+  load_denoiser: True
+  load_rew_end_model: True
+  load_actor_critic: True
+
+common:
+  devices: all  # int, list of int, cpu, or all 
+  seed: null
+  resume: False # do not modify, set by scripts/resume.sh only.
+
+checkpointing:
+  save_agent_every: 2
+  num_to_keep: 5
+
+collection:
+  train:
+    num_envs: 1
+    epsilon: 0.01
+    num_steps_total: 1000
+    first_epoch:
+      min: 100
+      max: 200
+      threshold_rew: 10
+    steps_per_epoch: 10
+  test:
+    num_envs: 1
+    num_episodes: 2
+    epsilon: 0.0
+    num_final_episodes: 10
+
+static_dataset:
+  path: ${env.path_data_low_res}
+  ignore_sample_weights: True
+
+training:
+  should: True
+  num_final_epochs: 5
+  cache_in_ram: False
+  num_workers_data_loaders: 2
+  model_free: False
+  compile_wm: False
+
+evaluation:
+  should: True
+  every: 1
+
+denoiser:
+  training:
+    num_autoregressive_steps: 2
+    start_after_epochs: 0
+    steps_first_epoch: 10
+    steps_per_epoch: 10
+    sample_weights: null
+    batch_size: 4
+    grad_acc_steps: 1
+    lr_warmup_steps: 10
+    max_grad_norm: 10.0
+
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-2
+    eps: 1e-8
+  
+  sigma_distribution:
+    _target_: models.diffusion.SigmaDistributionConfig
+    loc: -1.2
+    scale: 1.2
+    sigma_min: 2e-3
+    sigma_max: 20
+
+# Disable upsampler training entirely
+upsampler:
+  training:
+    num_autoregressive_steps: 0  # Set to 0 to disable
+    start_after_epochs: 999999  # Never start
+    steps_first_epoch: 0
+    steps_per_epoch: 0
+    sample_weights: null
+    batch_size: 1
+    grad_acc_steps: 1
+    lr_warmup_steps: 0
+    max_grad_norm: 10.0
+
+  optimizer: ${denoiser.optimizer}
+  sigma_distribution: ${denoiser.sigma_distribution}

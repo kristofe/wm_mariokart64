@@ -10,3 +10,5 @@ diamond/cache
 diamond/processed
 diamond/trained
 diamond/outputs/
+tracks/
+data/

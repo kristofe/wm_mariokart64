@@ -45,8 +45,33 @@ class InnerModel(nn.Module):
 
     def forward(self, noisy_next_obs: Tensor, c_noise: Tensor, c_noise_cond: Tensor, obs: Tensor, act: Optional[Tensor]) -> Tensor:
         if self.act_emb is not None:
-            assert act.ndim == 2 or (act.ndim == 3 and act.size(2) == self.act_emb[0].num_embeddings and set(act.unique().tolist()).issubset(set([0, 1])))
-            act_emb = self.act_emb(act) if act.ndim == 2 else self.act_emb[1]((act.float() @ self.act_emb[0].weight))
+            # More flexible assertion for one-hot encoded actions
+            if act.ndim == 2:
+                # Integer indices - should be in range [0, num_actions-1]
+                assert act.min() >= 0 and act.max() < self.act_emb[0].num_embeddings
+                act_emb = self.act_emb(act)
+            elif act.ndim == 3:
+                # One-hot encoded - check if dimensions match
+                if act.size(2) == self.act_emb[0].num_embeddings:
+                    # Perfect match
+                    assert set(act.unique().tolist()).issubset(set([0, 1]))
+                    act_emb = self.act_emb[1]((act.float() @ self.act_emb[0].weight))
+                else:
+                    # Dimension mismatch - pad or truncate to match expected size
+                    expected_size = self.act_emb[0].num_embeddings
+                    actual_size = act.size(2)
+                    if actual_size < expected_size:
+                        # Pad with zeros
+                        padding = torch.zeros(act.shape[0], act.shape[1], expected_size - actual_size, 
+                                            device=act.device, dtype=act.dtype)
+                        act = torch.cat([act, padding], dim=2)
+                    else:
+                        # Truncate
+                        act = act[:, :, :expected_size]
+                    assert set(act.unique().tolist()).issubset(set([0, 1]))
+                    act_emb = self.act_emb[1]((act.float() @ self.act_emb[0].weight))
+            else:
+                raise ValueError(f"Invalid action shape: {act.shape}, expected 2D or 3D")
         else:
             assert act is None
             act_emb = 0

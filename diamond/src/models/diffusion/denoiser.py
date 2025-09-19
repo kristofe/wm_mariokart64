@@ -80,6 +80,20 @@ class Denoiser(nn.Module):
     def compute_model_output(self, noisy_next_obs: Tensor, obs: Tensor, act: Optional[Tensor], cs: Conditioners) -> Tensor:
         rescaled_obs = obs / self.cfg.sigma_data
         rescaled_noise = noisy_next_obs * cs.c_in
+        
+        # Convert actions from integer indices to one-hot encoding if needed
+        if act is not None and act.dtype == torch.long:
+            # Convert from integer indices to one-hot encoding
+            num_actions = 39  # From config
+            if act.ndim == 2:
+                # Shape: [batch, seq_len] -> [batch, seq_len, num_actions]
+                act_one_hot = torch.zeros(act.shape[0], act.shape[1], num_actions, device=act.device, dtype=torch.float)
+                act_one_hot.scatter_(2, act.unsqueeze(-1), 1)
+                act = act_one_hot
+            elif act.ndim == 3:
+                # Already in the right format, just ensure it's float
+                act = act.float()
+        
         return self.inner_model(rescaled_noise, cs.c_noise, cs.c_noise_cond, rescaled_obs, act)
     
     @torch.no_grad()

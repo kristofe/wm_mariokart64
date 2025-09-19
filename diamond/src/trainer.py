@@ -66,7 +66,7 @@ class Trainer(StateDictMixin):
 		if self._rank == 0:
 			# Create unique log directory with timestamp and run name
 			timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-			run_name = cfg.wandb.get("name", "diamond_training")
+			run_name = cfg.wandb.get("name") or "diamond_training"
 			# Clean run name for filesystem compatibility
 			run_name = "".join(c for c in run_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
 			run_name = run_name.replace(' ', '_')
@@ -459,11 +459,27 @@ class Trainer(StateDictMixin):
 		return to_log
 
 	def load_state_checkpoint(self) -> None:
-		self.load_state_dict(torch.load(self._path_state_ckpt, map_location=self._device))
+		state_dict = torch.load(self._path_state_ckpt, map_location=self._device)
+		if isinstance(state_dict, dict) and 'epoch' in state_dict:
+			# New format
+			self.epoch = state_dict['epoch']
+			self.agent.load_state_dict(state_dict['agent'])
+			self.num_batch_train.load_state_dict(state_dict['num_batch_train'])
+			self.num_batch_test.load_state_dict(state_dict['num_batch_test'])
+		else:
+			# Old format - fallback
+			self.load_state_dict(state_dict)
 
 	def save_checkpoint(self) -> None:
 		if self._rank == 0:
-			save_with_backup(self.state_dict(), self._path_state_ckpt)
+			# Create a safe state dict without thread locks
+			safe_state_dict = {
+				'epoch': self.epoch,
+				'agent': self.agent.state_dict(),
+				'num_batch_train': self.num_batch_train.state_dict(),
+				'num_batch_test': self.num_batch_test.state_dict(),
+			}
+			save_with_backup(safe_state_dict, self._path_state_ckpt)
 			self.train_dataset.save_to_default_path()
 			self.test_dataset.save_to_default_path()
 			self._keep_agent_copies(self.agent.state_dict(), self.epoch)

@@ -1,0 +1,104 @@
+defaults:
+  - _self_
+  - env: csgo
+  - agent: csgo
+  - world_model_env: fast
+
+hydra:
+  job:
+    chdir: True
+
+wandb:
+  mode: disabled
+  project: null
+  entity: null
+  name: "quick_test"
+  group: null
+  tags: null
+  notes: null
+
+initialization:
+  path_to_ckpt: null
+  load_denoiser: True
+  load_rew_end_model: True
+  load_actor_critic: True
+
+common:
+  devices: all  # int, list of int, cpu, or all 
+  seed: null
+  resume: False # do not modify, set by scripts/resume.sh only.
+
+checkpointing:
+  save_agent_every: 2  # Save more frequently for testing
+  num_to_keep: 5  # Keep fewer checkpoints
+
+collection:
+  train:
+    num_envs: 1
+    epsilon: 0.01
+    num_steps_total: 1000  # Much smaller for testing
+    first_epoch:
+      min: 100  # Much smaller
+      max: 200  # Much smaller
+      threshold_rew: 10
+    steps_per_epoch: 10  # Much smaller
+  test:
+    num_envs: 1
+    num_episodes: 2  # Smaller for testing
+    epsilon: 0.0
+    num_final_episodes: 10  # Smaller for testing
+
+static_dataset:
+  path: ${env.path_data_low_res}
+  ignore_sample_weights: True
+
+training:
+  should: True
+  num_final_epochs: 5  # Very small for quick test
+  cache_in_ram: False
+  num_workers_data_loaders: 2  # Fewer workers
+  model_free: False # if True, turn off world_model training and RL in imagination
+  compile_wm: False
+
+evaluation:
+  should: True
+  every: 1  # Evaluate every epoch for testing
+
+denoiser:
+  training:
+    num_autoregressive_steps: 2  # Reduced from 4
+    start_after_epochs: 0
+    steps_first_epoch: 10  # Much smaller
+    steps_per_epoch: 10  # Much smaller
+    sample_weights: null
+    batch_size: 4  # Smaller batch size
+    grad_acc_steps: 1
+    lr_warmup_steps: 10  # Smaller warmup
+    max_grad_norm: 10.0
+
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-2
+    eps: 1e-8
+  
+  sigma_distribution: # log normal distribution for sigma during training
+    _target_: models.diffusion.SigmaDistributionConfig
+    loc: -1.2
+    scale: 1.2
+    sigma_min: 2e-3
+    sigma_max: 20
+
+upsampler:
+  training:
+    num_autoregressive_steps: 1
+    start_after_epochs: 0
+    steps_first_epoch: 5  # Much smaller
+    steps_per_epoch: 5  # Much smaller
+    sample_weights: null
+    batch_size: 4  # Smaller batch size
+    grad_acc_steps: 1
+    lr_warmup_steps: 5  # Smaller warmup
+    max_grad_norm: 10.0
+
+  optimizer: ${denoiser.optimizer}
+  sigma_distribution: ${denoiser.sigma_distribution}
