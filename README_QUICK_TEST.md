@@ -4,22 +4,48 @@ This guide helps you quickly test and optimize your MarioKart64 training setup f
 
 ## 🚀 Quick Start
 
-### 1. Run the Quick Test
+### 1. Run the Ultra Quick Test (Recommended)
 ```bash
 cd diamond
-python quick_test.py
+.venv/bin/python ultra_quick_test.py
 ```
 
-This will run both configurations and show you if everything is working.
+This runs a 30-second test to verify everything works - **no input prompts needed!**
 
-### 2. Speed Test
+### 2. Run the Quick Test
+```bash
+.venv/bin/python quick_test.py
+```
+
+This runs a 2-5 minute test with both configurations.
+
+### 3. Speed Test
 ```bash
 ./test_speed.sh
 ```
 
 This runs a timed comparison between different configurations.
 
+### 4. View Training Logs
+```bash
+# View latest run in TensorBoard
+./scripts/launch_tensorboard.sh
+
+# List all available runs
+./scripts/list_runs.sh
+```
+
+TensorBoard will be available at http://localhost:6006
+
 ## 📁 Configuration Files
+
+### `trainer_ultra_quick.yaml` ⭐ **RECOMMENDED**
+- **Purpose**: Ultra quick test to verify everything works
+- **Epochs**: 1
+- **Batch size**: 2
+- **Steps per epoch**: 2
+- **Time**: ~30 seconds
+- **No input prompts needed!**
 
 ### `trainer_quick_test.yaml`
 - **Purpose**: Minimal test to verify everything works
@@ -27,6 +53,7 @@ This runs a timed comparison between different configurations.
 - **Batch size**: 4
 - **Steps per epoch**: 10
 - **Time**: ~2-5 minutes
+- **May need GPU memory optimization**
 
 ### `trainer_no_upsampling.yaml`
 - **Purpose**: Test without upsampling for maximum speed
@@ -87,25 +114,35 @@ training:
 
 ## 🔧 Running Different Configurations
 
-### Quick Test (5 minutes)
+### Ultra Quick Test (30 seconds) ⭐ **RECOMMENDED**
 ```bash
-python src/main.py --config-name=trainer_quick_test
+.venv/bin/python src/main.py --config-name=trainer_ultra_quick
 ```
+**No input prompts needed!** Uses reasonable defaults.
+
+### Quick Test (2-5 minutes)
+```bash
+.venv/bin/python src/main.py --config-name=trainer_quick_test
+```
+**No input prompts needed!** Uses reasonable defaults.
 
 ### Fast Training (2-4 hours)
 ```bash
-python src/main.py --config-name=trainer_fast
+.venv/bin/python src/main.py --config-name=trainer_fast
 ```
+**No input prompts needed!** Uses reasonable defaults.
 
 ### No Upsampling (1-2 hours)
 ```bash
-python src/main.py --config-name=trainer_no_upsampling
+.venv/bin/python src/main.py --config-name=trainer_no_upsampling
 ```
+**No input prompts needed!** Uses reasonable defaults.
 
 ### Original Full Training (10+ hours)
 ```bash
-python src/main.py --config-name=trainer
+.venv/bin/python src/main.py --config-name=trainer
 ```
+**Interactive prompts** - asks for grad acc steps, batch sizes, and data paths.
 
 ## 📊 Expected Performance
 

@@ -71,7 +71,7 @@ denoiser:
     steps_per_epoch: 2  # Very small
     sample_weights: null
     batch_size: 2  # Very small
-    grad_acc_steps: 1
+    grad_acc_steps: 1  # Default for ultra quick test
     lr_warmup_steps: 1  # Very small
     max_grad_norm: 10.0
 
@@ -95,7 +95,7 @@ upsampler:
     steps_per_epoch: 1  # Very small
     sample_weights: null
     batch_size: 2  # Very small
-    grad_acc_steps: 1
+    grad_acc_steps: 1  # Default for ultra quick test
     lr_warmup_steps: 1  # Very small
     max_grad_norm: 10.0
 

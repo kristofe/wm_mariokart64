@@ -46,19 +46,8 @@ def run_ultra_quick_test():
             universal_newlines=True
         )
         
-        # Send the required inputs
-        inputs = [
-            "1",  # DENOISER Grad acc steps
-            "2",  # DENOISER batch size
-            "1",  # UPSAMPLER Grad acc steps  
-            "2",  # UPSAMPLER batch size
-            "/home/kristofe/Documents/Projects/wm_mariokart64/tracks/low_res",  # path_data_low_res
-            "/home/kristofe/Documents/Projects/wm_mariokart64/tracks/full_res",  # path_data_full_res
-        ]
-        
-        # Send inputs and read output
-        input_str = "\n".join(inputs) + "\n"
-        stdout, _ = process.communicate(input=input_str, timeout=60)  # 1 minute timeout
+        # No inputs needed - using config defaults
+        stdout, _ = process.communicate(timeout=60)  # 1 minute timeout
         
         print("📊 Training output:")
         print(stdout)

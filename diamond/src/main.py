@@ -21,23 +21,38 @@ def main(cfg: DictConfig) -> None:
 	setup_visible_cuda_devices(cfg.common.devices)
 	world_size = torch.cuda.device_count()
 	root_dir = Path(hydra.utils.get_original_cwd())
-	print("--- DENOISER ---")
-	cfg.denoiser.training.grad_acc_steps = int(input("DENOISER Grad acc steps: "))
-	cfg.denoiser.training.batch_size = int(input("DENOISER batch size: "))
 	
-	print("--- UPSAMPLER ---")
+	# Check if this is the original config that needs interactive input
+	is_original_config = cfg.get('_target_') is None and 'trainer' in str(cfg.get('hydra', {}).get('job', {}).get('config_name', ''))
 	
-	cfg.upsampler.training.grad_acc_steps = int(input("UPSAMPLER Grad acc steps: "))
-	cfg.upsampler.training.batch_size = int(input("UPSAMPLER batch size: "))
-	buffer = input(f"path_data_low_res: [default: {cfg.env.path_data_low_res}]")
-	if buffer and buffer != "":
-		cfg.env.path_data_low_res = buffer
-	print(cfg.env.path_data_low_res)
+	if is_original_config:
+		# Original config - use interactive input
+		print("--- DENOISER ---")
+		cfg.denoiser.training.grad_acc_steps = int(input("DENOISER Grad acc steps: "))
+		cfg.denoiser.training.batch_size = int(input("DENOISER batch size: "))
+		
+		print("--- UPSAMPLER ---")
+		cfg.upsampler.training.grad_acc_steps = int(input("UPSAMPLER Grad acc steps: "))
+		cfg.upsampler.training.batch_size = int(input("UPSAMPLER batch size: "))
+		
+		buffer = input(f"path_data_low_res: [default: {cfg.env.path_data_low_res}]")
+		if buffer and buffer != "":
+			cfg.env.path_data_low_res = buffer
+		print(cfg.env.path_data_low_res)
 
-	buffer = input(f"path_data_full_res: [default: {cfg.env.path_data_full_res}]")
-	if buffer and buffer != "":
-		cfg.env.path_data_full_res = buffer
-	print(cfg.env.path_data_full_res)
+		buffer = input(f"path_data_full_res: [default: {cfg.env.path_data_full_res}]")
+		if buffer and buffer != "":
+			cfg.env.path_data_full_res = buffer
+		print(cfg.env.path_data_full_res)
+	else:
+		# Quick test configs - use defaults from config
+		print("--- Using config defaults ---")
+		print(f"DENOISER Grad acc steps: {cfg.denoiser.training.grad_acc_steps}")
+		print(f"DENOISER batch size: {cfg.denoiser.training.batch_size}")
+		print(f"UPSAMPLER Grad acc steps: {cfg.upsampler.training.grad_acc_steps}")
+		print(f"UPSAMPLER batch size: {cfg.upsampler.training.batch_size}")
+		print(f"path_data_low_res: {cfg.env.path_data_low_res}")
+		print(f"path_data_full_res: {cfg.env.path_data_full_res}")
 	
 	if world_size < 2:
 		run(cfg, root_dir)
