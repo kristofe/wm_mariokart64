@@ -63,6 +63,12 @@ training:
 evaluation:
   should: False  # Skip evaluation for ultra quick test
 
+# Optimized logging for quick tests
+logging:
+  tensorboard_frequency: 1  # Log every epoch for quick tests
+  image_frequency: 1  # Log images every epoch for quick tests
+  wandb_frequency: 1  # Log to wandb every epoch
+
 denoiser:
   training:
     num_autoregressive_steps: 1  # Very small

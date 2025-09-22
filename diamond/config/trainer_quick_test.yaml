@@ -64,6 +64,12 @@ evaluation:
   should: True
   every: 1  # Evaluate every epoch for testing
 
+# Optimized logging for quick tests
+logging:
+  tensorboard_frequency: 2  # Log every 2 epochs for quick tests
+  image_frequency: 5  # Log images every 5 epochs
+  wandb_frequency: 1  # Log to wandb every epoch
+
 denoiser:
   training:
     num_autoregressive_steps: 2  # Reduced from 4

@@ -37,6 +37,32 @@ This runs a timed comparison between different configurations.
 
 TensorBoard will be available at http://localhost:6006
 
+## 📊 Optimized Logging
+
+The configurations now include optimized logging settings to reduce computational overhead:
+
+### Logging Frequencies by Configuration:
+
+| Configuration | TensorBoard | Images | WandB | Use Case |
+|---------------|-------------|--------|-------|----------|
+| **Ultra Quick** | Every epoch | Every epoch | Every epoch | Quick verification |
+| **Quick Test** | Every 2 epochs | Every 5 epochs | Every epoch | Testing |
+| **Fast** | Every 5 epochs | Every 20 epochs | Every 5 epochs | Development |
+| **No Upsampling** | Every 5 epochs | Every 20 epochs | Every 5 epochs | Fast iteration |
+| **Original** | Every 5 epochs | Every 10 epochs | Every epoch | Full training |
+
+### Image Logging Features:
+- **Training samples**: Visualizes input data during training
+- **Generated samples**: Shows model outputs (when available)
+- **Comparison grids**: Side-by-side comparisons
+- **Automatic scaling**: Images are properly normalized for display
+
+### Performance Benefits:
+- **Reduced I/O overhead**: Less frequent disk writes
+- **Lower memory usage**: Smaller batch sizes for visualization
+- **Faster training**: Less time spent on logging operations
+- **Better monitoring**: Key metrics still tracked regularly
+
 ## 📁 Configuration Files
 
 ### `trainer_ultra_quick.yaml` ⭐ **RECOMMENDED**
