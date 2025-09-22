@@ -49,7 +49,7 @@ collection:
     num_final_episodes: 10
 
 static_dataset:
-  path: ${env.path_data_low_res}
+  path: /home/kristofe/Documents/Projects/wm_mariokart64/tracks/low_res
   ignore_sample_weights: True
 
 training:
@@ -63,6 +63,7 @@ training:
 evaluation:
   should: True
   every: 1
+  log_denoising_trajectory: True  # Enable logging of denoising trajectories to tensorboard
 
 denoiser:
   training:

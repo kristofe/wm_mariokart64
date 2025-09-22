@@ -77,12 +77,11 @@ def make_collector(
                 episode_ids[i] = dataset.add_episode(ep, episode_id=episode_ids[i])
 
             if dead[i]:
-                to_log.append(
-                    {
-                        f"{dataset.name}/episode_id": episode_ids[i],
-                        **ep.compute_metrics(),
-                    }
-                )
+                log_dict = {
+                    f"{dataset.name}/episode_id": episode_ids[i],
+                    **ep.compute_metrics(),
+                }
+                to_log.append(log_dict)
                 buffer[i] = []
                 episode_ids[i] = None
                 pbar.update(1 if num_to_collect.episodes is not None else 0)

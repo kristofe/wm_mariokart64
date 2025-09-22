@@ -101,7 +101,7 @@ upsampler:
     steps_first_epoch: 5  # Much smaller
     steps_per_epoch: 5  # Much smaller
     sample_weights: null
-    batch_size: 4  # Smaller batch size
+    batch_size: 1  # Smaller batch size
     grad_acc_steps: 1  # Default for quick test
     lr_warmup_steps: 5  # Smaller warmup
     max_grad_norm: 10.0

@@ -9,6 +9,7 @@ from hydra.utils import instantiate
 import numpy as np
 from omegaconf import DictConfig, OmegaConf
 import torch
+import torch.nn.functional as F
 import torch.distributed as dist
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
@@ -140,9 +141,7 @@ class Trainer(StateDictMixin):
 			self._train_collector = make_collector(
 				train_env, self.agent.actor_critic, self.train_dataset, cfg.collection.train.epsilon
 			)
-			self._test_collector = make_collector(
-				test_env, self.agent.actor_critic, self.test_dataset, cfg.collection.test.epsilon, reset_every_collect=True
-			)
+			# Test collector will be created later after data loaders are set up
 
 		######################################################
 
@@ -229,6 +228,38 @@ class Trainer(StateDictMixin):
 			actor_critic_loss_cfg = None
 			rl_env = None
 
+		# Create test collector after data loaders are set up
+		if not self._is_static_dataset and self._rank == 0:
+			# Create test environment - use WorldModelEnv if denoising trajectory logging is enabled
+			if cfg.evaluation.log_denoising_trajectory and not self._is_model_free and self.agent.denoiser is not None:
+				# Create a simple data loader for WorldModelEnv
+				from data import make_batch_sampler, get_sample_weights
+				c = cfg.actor_critic.training
+				sl = c.seq_length
+				bs = make_batch_sampler(c.batch_size, sl, get_sample_weights(c.sample_weights))
+				dl_actor_critic_test = make_data_loader(batch_sampler=bs)
+				
+				# Create WorldModelEnv for testing with denoising trajectory logging
+				wm_env_cfg = instantiate(cfg.world_model_env)
+				test_wm_env = WorldModelEnv(
+					self.agent.denoiser, 
+					self.agent.upsampler, 
+					self.agent.rew_end_model, 
+					dl_actor_critic_test, 
+					wm_env_cfg,
+					return_denoising_trajectory=True
+				)
+				self._test_collector = make_collector(
+					test_wm_env, self.agent.actor_critic, self.test_dataset, cfg.collection.test.epsilon, reset_every_collect=True
+				)
+				print("DEBUG: Using WorldModelEnv for testing with denoising trajectory logging")
+			else:
+				# Use regular atari environment
+				self._test_collector = make_collector(
+					test_env, self.agent.actor_critic, self.test_dataset, cfg.collection.test.epsilon, reset_every_collect=True
+				)
+				print("DEBUG: Using regular atari environment for testing")
+
 		# Setup training
 		sigma_distribution_cfg = instantiate(cfg.denoiser.sigma_distribution)
 		sigma_distribution_cfg_upsampler = instantiate(cfg.upsampler.sigma_distribution) if self.agent.upsampler is not None else None
@@ -291,7 +322,9 @@ class Trainer(StateDictMixin):
 			should_collect_test = should_test and not self._is_static_dataset
 
 			if should_collect_test:
+				print(f"DEBUG: Running collect_test at epoch {self.epoch}")
 				to_log += self.collect_test()
+				print(f"DEBUG: collect_test returned {len(to_log)} log entries")
 
 			if should_test and not self._is_model_free:
 				to_log += self.test_agent()
@@ -299,10 +332,7 @@ class Trainer(StateDictMixin):
 			# Logging
 			to_log.append({"duration": (time.time() - start_time) / 3600})
 			if self._rank == 0:
-				# Get wandb logging frequency from config, default to every epoch
-				wandb_freq = getattr(self._cfg.logging, 'wandb_frequency', 1)
-				if self.epoch % wandb_freq == 0:
-					wandb_log(to_log, self.epoch)
+				wandb_log(to_log, self.epoch)
 				self.log_to_tensorboard(to_log, self.epoch)
 			to_log = []
 
@@ -315,7 +345,6 @@ class Trainer(StateDictMixin):
 		# Last collect
 		if self._rank == 0 and not self._is_static_dataset:
 			final_logs = self.collect_test(final=True)
-			# Always log final results
 			wandb_log(final_logs, self.epoch)
 			self.log_to_tensorboard(final_logs, self.epoch)
 
@@ -450,7 +479,12 @@ class Trainer(StateDictMixin):
 		data_loader = self._data_loader_test.get(name)
 		model.eval()
 		to_log = []
-		for batch in tqdm(data_loader, desc=f"Evaluating {name}"):
+		
+		# Limit evaluation to a reasonable number of batches for speed
+		max_eval_batches = 20  # Good balance of speed vs accuracy
+		for i, batch in enumerate(tqdm(data_loader, desc=f"Evaluating {name}")):
+			if i >= max_eval_batches:
+				break
 			batch = batch.to(self._device)
 			_, metrics = model(batch)
 			num_batch = self.num_batch_test.get(name)
@@ -490,16 +524,8 @@ class Trainer(StateDictMixin):
 			self._save_info_for_import_script(self.epoch)
 
 	def log_to_tensorboard(self, logs: List[dict], epoch: int) -> None:
-		"""Log metrics to TensorBoard with configurable frequency and image logging"""
+		"""Log metrics to TensorBoard"""
 		if self.tb_writer is None:
-			return
-		
-		# Get logging frequency from config, default to every 5 epochs
-		tb_freq = getattr(self._cfg.logging, 'tensorboard_frequency', 5)
-		img_freq = getattr(self._cfg.logging, 'image_frequency', 10)
-		
-		# Only log metrics at specified frequency
-		if epoch % tb_freq != 0 and epoch != 0:
 			return
 		
 		for log_dict in logs:
@@ -510,57 +536,76 @@ class Trainer(StateDictMixin):
 					# Skip confusion matrices for now to keep it simple
 					continue
 		
-		# Log generated images at specified frequency
-		if epoch % img_freq == 0 and hasattr(self, 'agent') and self.agent.denoiser is not None:
-			self.log_generated_images(epoch)
+		# Log sample images from the training dataset every epoch
+		if epoch % 1 == 0:  # Log every epoch
+			self.log_sample_images(epoch)
 		
 		self.tb_writer.flush()
 	
-	def log_generated_images(self, epoch: int) -> None:
-		"""Log generated images to TensorBoard"""
-		if self.tb_writer is None or not hasattr(self, 'agent'):
-			return
-		
+	def log_sample_images(self, epoch: int) -> None:
+		"""Log sample images from the training dataset"""
 		try:
-			# Get a sample batch for generation
-			if hasattr(self, '_data_loader_train') and self._data_loader_train.denoiser is not None:
-				data_iter = iter(self._data_loader_train.denoiser)
-				batch = next(data_iter).to(self._device)
+			# Get a batch from the training dataset
+			data_loader = self._data_loader_train.denoiser
+			if data_loader is not None:
+				batch = next(iter(data_loader))
+				# Ensure batch is on the correct device
+				batch = batch.to(self._device)
 				
-				# Create a smaller batch for visualization (first 4 samples)
-				small_batch = type(batch)(
-					obs=batch.obs[:4],
-					act=batch.act[:4] if hasattr(batch, 'act') else None,
-					rew=batch.rew[:4] if hasattr(batch, 'rew') else None,
-					end=batch.end[:4] if hasattr(batch, 'end') else None,
-					trunc=batch.trunc[:4] if hasattr(batch, 'trunc') else None,
-					mask_padding=batch.mask_padding[:4] if hasattr(batch, 'mask_padding') else None,
-					info=batch.info[:4] if hasattr(batch, 'info') else [],
-					segment_ids=batch.segment_ids[:4] if hasattr(batch, 'segment_ids') else []
-				)
+				if hasattr(batch, 'obs') and batch.obs is not None:
+					# Get the first few images from the batch
+					# Shape is [batch, sequence_length, channels, height, width]
+					images = batch.obs[:4]  # Take first 4 sequences
+					# Take the first frame from each sequence
+					images = images[:, 0]  # Shape: [batch, channels, height, width]
+					# Convert from [-1,1] to [0,1] range
+					images_normalized = (images + 1) / 2
+					# Log input images to tensorboard
+					self.tb_writer.add_images("input_images", images_normalized, epoch)
+					print(f"📸 Logged {images.shape[0]} input images to TensorBoard")
+					
+					# Now get model outputs
+					self.log_model_outputs(batch, epoch)
+				else:
+					print("⚠️ No obs found in batch")
+			else:
+				print("⚠️ No denoiser data loader available")
+		except Exception as e:
+			print(f"⚠️ Could not log sample images: {e}")
+	
+	def log_model_outputs(self, batch, epoch: int) -> None:
+		"""Log model outputs (denoised images)"""
+		try:
+			# Set model to eval mode for inference
+			self.agent.eval()
+			
+			# Ensure batch is on the correct device
+			batch = batch.to(self._device)
+			
+			with torch.no_grad():
+				# Get model outputs
+				loss, metrics = self.agent.denoiser(batch)
 				
-				# Generate a sample with the denoiser
-				with torch.no_grad():
-					# Get model output using the batch
-					loss, logs = self.agent.denoiser(small_batch)
+				# Extract real denoised outputs from the model
+				if hasattr(self.agent.denoiser, 'last_denoised_outputs') and self.agent.denoiser.last_denoised_outputs is not None:
+					# Get the real denoised outputs
+					denoised_outputs = self.agent.denoiser.last_denoised_outputs
 					
-					# For now, just log the original observations as a simple visualization
-					# This is a simplified version - in a full implementation you'd want to
-					# generate actual samples from the diffusion model
-					obs = small_batch.obs[:4]  # Take first 4 samples
+					# Take the first frame from each sequence (shape: [batch, channels, height, width])
+					outputs = denoised_outputs[:4, 0]  # Take first 4 sequences, first frame
 					
-					# Convert to displayable format (0-1 range)
-					original = (obs.float() + 1) / 2  # Convert from [-1,1] to [0,1]
-					
-					# Create a simple grid showing the observations
-					# Reshape to [batch, channels, height, width] for TensorBoard
-					if len(original.shape) == 5:  # [batch, seq, channels, height, width]
-						original = original[:, 0]  # Take first frame of sequence
+					# Convert from [-1,1] to [0,1] range for TensorBoard
+					outputs_normalized = (outputs + 1) / 2
 					
 					# Log to TensorBoard
-					self.tb_writer.add_images('training_samples', original, epoch)
-					
+					self.tb_writer.add_images("denoised_outputs", outputs_normalized, epoch)
+					print(f"📸 Logged {outputs.shape[0]} real denoised outputs to TensorBoard")
+				else:
+					print("⚠️ No denoised outputs available from denoiser")
+			
+			# Set model back to train mode
+			self.agent.train()
+			
 		except Exception as e:
-			# Don't let image logging break training
-			print(f"Warning: Could not log generated images: {e}")
-			pass
+			print(f"⚠️ Could not log model outputs: {e}")
+	

@@ -152,4 +152,8 @@ class Denoiser(nn.Module):
             all_obs[:, n + i] = denoised
 
         loss /= seq_length
+        
+        # Store the final denoised outputs for logging
+        self.last_denoised_outputs = all_obs[:, n:].clone()  # Store the denoised sequence
+        
         return loss, {"loss_denoising": loss.item()}

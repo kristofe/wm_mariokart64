@@ -48,8 +48,6 @@ def run_quick_test(config_name="trainer_quick_test", disable_upsampling=False):
         process = subprocess.Popen(
             cmd,
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
             text=True,
             env=env,
             bufsize=1,
