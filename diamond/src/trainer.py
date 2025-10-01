@@ -62,16 +62,16 @@ class Trainer(StateDictMixin):
 			try_until_no_except(
 				partial(wandb.init, config=OmegaConf.to_container(cfg, resolve=True), reinit=True, resume=True, **cfg.wandb)
 			)
-
+		timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+ 		# Create unique log directory with timestamp and run name
+		run_name = cfg.wandb.get("name") or "diamond_training"
 		# Init TensorBoard with unique log directory
 		if self._rank == 0:
-			# Create unique log directory with timestamp and run name
-			timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-			run_name = cfg.wandb.get("name") or "diamond_training"
+			
 			# Clean run name for filesystem compatibility
 			run_name = "".join(c for c in run_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
 			run_name = run_name.replace(' ', '_')
-			log_dir = f"runs/{run_name}_{timestamp}"
+			log_dir = f"/local_disk0/diamond/runs/{run_name}_{timestamp}"
 			self.tb_writer = SummaryWriter(log_dir=log_dir)
 			print(f"TensorBoard logs will be saved to: {log_dir}")
 		else:
@@ -82,7 +82,7 @@ class Trainer(StateDictMixin):
 		self._is_model_free = cfg.training.model_free
 
 		# Checkpointing
-		self._path_ckpt_dir = Path("checkpoints")
+		self._path_ckpt_dir = Path(f"/Volumes/personal_schema/kschlachter/v_kschlachter/diamond/checkpoints_{run_name}_{timestamp}")
 		self._path_state_ckpt = self._path_ckpt_dir / "state.pt"
 		self._keep_agent_copies = partial(
 			keep_agent_copies_every,

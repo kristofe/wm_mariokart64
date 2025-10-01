@@ -49,14 +49,14 @@ collection:
     num_final_episodes: 10
 
 static_dataset:
-  path: /home/kristofe/Documents/Projects/wm_mariokart64/tracks/low_res
+  path: /Volumes/personal_schema/kschlachter/v_kschlachter/diamond/processed/low_res
   ignore_sample_weights: True
 
 training:
   should: True
-  num_final_epochs: 5
+  num_final_epochs: 50
   cache_in_ram: False
-  num_workers_data_loaders: 2
+  num_workers_data_loaders: 8
   model_free: False
   compile_wm: False
 
@@ -72,8 +72,8 @@ denoiser:
     steps_first_epoch: 10
     steps_per_epoch: 10
     sample_weights: null
-    batch_size: 4
-    grad_acc_steps: 1  # Default for no upsampling test
+    batch_size: 16
+    grad_acc_steps: 2  # Default for no upsampling test
     lr_warmup_steps: 10
     max_grad_norm: 10.0
 

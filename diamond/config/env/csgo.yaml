@@ -2,6 +2,6 @@ train:
   id: csgo
   size: [320, 240]
 num_actions: 39
-path_data_low_res: /home/kristofe/Documents/Projects/wm_mariokart64/tracks/low_res
-path_data_full_res: /home/kristofe/Documents/Projects/wm_mariokart64/tracks/full_res
+path_data_low_res: /Volumes/personal_schema/kschlachter/v_kschlachter/diamond/processed/low_res
+path_data_full_res: /Volumes/personal_schema/kschlachter/v_kschlachter/diamond/processed/full_res
 keymap: csgo

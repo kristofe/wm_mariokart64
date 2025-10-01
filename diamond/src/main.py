@@ -28,19 +28,19 @@ def main(cfg: DictConfig) -> None:
 	if is_original_config:
 		# Original config - use interactive input
 		print("--- DENOISER ---")
-		cfg.denoiser.training.grad_acc_steps = int(input("DENOISER Grad acc steps: "))
-		cfg.denoiser.training.batch_size = int(input("DENOISER batch size: "))
+		cfg.denoiser.training.grad_acc_steps = 6 #int(input("DENOISER Grad acc steps: "))
+		cfg.denoiser.training.batch_size = 28 #int(input("DENOISER batch size: "))
 		
 		print("--- UPSAMPLER ---")
-		cfg.upsampler.training.grad_acc_steps = int(input("UPSAMPLER Grad acc steps: "))
-		cfg.upsampler.training.batch_size = int(input("UPSAMPLER batch size: "))
+		cfg.upsampler.training.grad_acc_steps = 1 #int(input("UPSAMPLER Grad acc steps: "))
+		cfg.upsampler.training.batch_size = 4 #int(input("UPSAMPLER batch size: "))
 		
-		buffer = input(f"path_data_low_res: [default: {cfg.env.path_data_low_res}]")
+		buffer =  '/local_disk0/diamond/processed/low_res' #input(f"path_data_low_res: [default: {cfg.env.path_data_low_res}]")
 		if buffer and buffer != "":
 			cfg.env.path_data_low_res = buffer
 		print(cfg.env.path_data_low_res)
 
-		buffer = input(f"path_data_full_res: [default: {cfg.env.path_data_full_res}]")
+		buffer = ' /local_disk0/diamond/processed/full_res' #input(f"path_data_full_res: [default: {cfg.env.path_data_full_res}]")
 		if buffer and buffer != "":
 			cfg.env.path_data_full_res = buffer
 		print(cfg.env.path_data_full_res)

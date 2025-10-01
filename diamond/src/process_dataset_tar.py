@@ -119,9 +119,10 @@ def main():
 		str_files = "\n".join(map(str, tar_files))
 		print(f"Ready to untar {n} tar files:\n{str_files}")
 
-		remove_tar = (
-			input("Remove .tar files once they are processed? [y|N] ").lower() == "y"
-		)
+		remove_tar = False
+		#remove_tar = (
+		#	input("Remove .tar files once they are processed? [y|N] ").lower() == "y"
+		#)
 
 		# Untar CSGO files
 		f = partial(process_tar, out_dir=full_res_dir, remove_tar=remove_tar)
