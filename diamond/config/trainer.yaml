@@ -66,13 +66,13 @@ evaluation:
 
 denoiser:
   training:
-    num_autoregressive_steps: 4
+    num_autoregressive_steps: 2
     start_after_epochs: 0
     steps_first_epoch: 100
     steps_per_epoch: 100
     sample_weights: null
-    batch_size: 14
-    grad_acc_steps: 1
+    batch_size: 16
+    grad_acc_steps: 2
     lr_warmup_steps: 100
     max_grad_norm: 10.0
 
@@ -95,7 +95,7 @@ upsampler:
     steps_first_epoch: 400
     steps_per_epoch: 400
     sample_weights: null
-    batch_size: 14
+    batch_size: 1
     grad_acc_steps: 1
     lr_warmup_steps: 100
     max_grad_norm: 10.0

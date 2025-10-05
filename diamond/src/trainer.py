@@ -71,7 +71,8 @@ class Trainer(StateDictMixin):
 			# Clean run name for filesystem compatibility
 			run_name = "".join(c for c in run_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
 			run_name = run_name.replace(' ', '_')
-			log_dir = f"/local_disk0/diamond/runs/{run_name}_{timestamp}"
+			#log_dir = f"/Volumes/personal_schema/kschlachter/v_kschlachter/diamond/runs/{run_name}_{timestamp}"
+			log_dir = f"/local_disk0/runs/{run_name}_{timestamp}"
 			self.tb_writer = SummaryWriter(log_dir=log_dir)
 			print(f"TensorBoard logs will be saved to: {log_dir}")
 		else:
@@ -541,7 +542,7 @@ class Trainer(StateDictMixin):
 			self.log_sample_images(epoch)
 		
 		self.tb_writer.flush()
-	
+  
 	def log_sample_images(self, epoch: int) -> None:
 		"""Log sample images from the training dataset"""
 		try:

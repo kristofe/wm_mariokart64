@@ -29,7 +29,7 @@ def main(cfg: DictConfig) -> None:
 		# Original config - use interactive input
 		print("--- DENOISER ---")
 		cfg.denoiser.training.grad_acc_steps = 6 #int(input("DENOISER Grad acc steps: "))
-		cfg.denoiser.training.batch_size = 28 #int(input("DENOISER batch size: "))
+		cfg.denoiser.training.batch_size = 14 #int(input("DENOISER batch size: "))
 		
 		print("--- UPSAMPLER ---")
 		cfg.upsampler.training.grad_acc_steps = 1 #int(input("UPSAMPLER Grad acc steps: "))
