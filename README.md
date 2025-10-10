@@ -31,7 +31,11 @@ https://www.youtube.com/watch?v=c2CpUxQxDI4&ab_channel=DereDev
    ```
 
 2. **Install Requirements**  
-
+   - **Setup correct python with conda:**
+     ```bash
+     conda create --name mk64 python=3.12
+     ```
+     
    - **Install pip requirements:**
      ```bash
      pip3 install -r requirements.txt
